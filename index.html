@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ADI Part 3 — Jamil Lesson Simulator</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="brand-mark">ADI</span><div><strong>PART 3 LESSON SIMULATOR</strong><small>Meeting oncoming traffic · Passing parked vehicles</small></div></div>
+  <div class="top-actions"><span class="pill">UK · Right-hand drive</span><button id="voiceToggle" class="secondary">Voice: On</button></div>
+</header>
+<main>
+  <section class="stage-wrap">
+    <div class="stage-head"><div><span id="phase" class="eyebrow">LESSON PLANNING</span><h1 id="sceneTitle">Meet Jamil and agree the lesson</h1></div><div class="time-chip"><span>PLANNED SCENE</span><strong id="duration">3 minutes</strong></div></div>
+    <div id="stage" class="stage briefing">
+      <div class="sky"></div><div class="horizon"></div>
+      <div class="houses left-house"><i></i><i></i><i></i></div><div class="houses right-house"><i></i><i></i><i></i></div>
+      <div class="road"><div class="road-line"></div></div>
+      <div class="pavement left-pavement"></div><div class="pavement right-pavement"></div>
+      <div class="parked-car parked-one"><span class="window"></span><span class="wheel w1"></span><span class="wheel w2"></span></div>
+      <div class="parked-car parked-two"><span class="window"></span><span class="wheel w1"></span><span class="wheel w2"></span></div>
+      <div class="oncoming-car"><span class="window"></span><span class="wheel w1"></span><span class="wheel w2"></span></div>
+      <div class="instructor-car"><div class="car-roof"><span class="person instructor-person"></span><span class="person pupil-person"></span></div><div class="car-body"><span class="headlight"></span></div><span class="car-wheel cw1"></span><span class="car-wheel cw2"></span></div>
+      <div class="examiner-tag">EXAMINER OBSERVING</div>
+      <div class="road-label" id="roadLabel">Residential road · parked cars · safe gaps</div>
+      <div class="scene-overlay" id="sceneOverlay"><strong>Lesson objective</strong><span>Look ahead · plan early · choose a safe gap</span></div>
+    </div>
+    <div class="progress-row"><div class="progress-track"><div id="progress" class="progress"></div></div><span id="lineCounter">Line 1 of 16</span></div>
+  </section>
+  <section class="lesson-grid">
+    <article class="dialogue-card">
+      <div class="card-head"><div><span class="eyebrow">LIVE DIALOGUE</span><h2>Instructor & Jamil</h2></div><span id="speakerBadge" class="speaker-badge">INSTRUCTOR</span></div>
+      <div id="dialogue" class="dialogue">Hi Jamil, good to see you again.</div>
+      <div id="subtitle" class="subtitle">British English subtitles appear here.</div>
+      <div class="controls">
+        <button id="prevBtn" class="secondary">← Previous</button>
+        <button id="speakBtn" class="secondary">▶ Speak line</button>
+        <button id="nextBtn" class="primary">Next line →</button>
+      </div>
+      <div class="controls lower">
+        <button id="playSceneBtn" class="secondary">Play scene dialogue</button>
+        <button id="stopBtn" class="secondary">Stop voice</button>
+        <button id="nextSceneBtn" class="primary">Next scene ↗</button>
+      </div>
+      <p class="note">Voice availability depends on your browser and installed voices. Choose an English (United Kingdom) voice in your device settings if available.</p>
+    </article>
+    <aside class="scene-card">
+      <span class="eyebrow">LESSON ROADMAP</span><h2>Scene list</h2><div id="sceneList" class="scene-list"></div>
+      <div class="key-card"><strong>Instructor focus</strong><p id="focusText">Agree a goal with Jamil and check confidence.</p></div>
+    </aside>
+  </section>
+  <section class="reminders">
+    <div><span class="number">01</span><strong>Teaching</strong><p>Ask open questions. Let Jamil explain his decisions.</p></div>
+    <div><span class="number">02</span><strong>Risk management</strong><p>Intervene early when safety requires it; do not let a dangerous situation develop.</p></div>
+    <div><span class="number">03</span><strong>FCPS</strong><p>Fault → Cause → Risk → Solution. Agree how to improve on the next attempt.</p></div>
+    <div><span class="number">04</span><strong>Pupil-centred</strong><p>Adjust prompts and route difficulty to Jamil's performance and confidence.</p></div>
+  </section>
+</main>
+<footer>Practice simulation based on the supplied lesson-plan material. It is not an official DVSA product or a guarantee of an exam grade.</footer>
+<script src="script.js"></script>
+</body>
+</html>
