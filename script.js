@@ -57,20 +57,80 @@ function renderLine(){
  renderSceneList();
 }
 function renderAll(){renderStage();renderLine();}
-function stopVoice(){if(synth)synth.cancel();playingScene=false;$("playSceneBtn").textContent="Play scene dialogue";}
-function getVoice(){
- if(!synth)return null; const voices=synth.getVoices();
- return voices.find(v=>/en-GB/i.test(v.lang)&&/female|serena|kate|amy|libby|sonia|google uk english female/i.test(v.name))
-   ||voices.find(v=>/en-GB/i.test(v.lang))||voices.find(v=>/en/i.test(v.lang))||null;
+// ---- Speech (hardened against Chrome/Edge/Safari Web Speech quirks) ----
+let speechToken = 0;            // bumps on every stop so stale callbacks are ignored
+let activeUtterances = [];      // strong refs: stops Chrome garbage-collecting utterances (onend never firing)
+let keepAlive = null;           // reserved; long lines are chunked instead (Chrome cuts off after ~15s)
+let cachedVoices = [];
+function loadVoices(){ if(synth){ const v=synth.getVoices(); if(v.length) cachedVoices=v; } return cachedVoices; }
+if(synth){ loadVoices(); synth.addEventListener ? synth.addEventListener("voiceschanged",loadVoices) : (synth.onvoiceschanged=loadVoices); }
+function waitForVoices(ms=1500){
+ return new Promise(res=>{
+  if(loadVoices().length) return res();
+  const t0=Date.now(); const iv=setInterval(()=>{ if(loadVoices().length||Date.now()-t0>ms){clearInterval(iv);res();} },100);
+ });
 }
-function speakCurrent(onend){
- if(!voiceOn||!synth){if(onend)onend();return;}
- synth.cancel(); const l=scenes[sceneIndex].lines[lineIndex];
- const u=new SpeechSynthesisUtterance((l[0]==="JAMIL"?"Jamil says. ":"Instructor says. ")+l[1]);
- u.lang="en-GB";u.rate=0.91;u.pitch=l[0]==="JAMIL"?1.03:0.94;
- const v=getVoice();if(v)u.voice=v;
- if(onend)u.onend=onend;
- synth.speak(u);
+function voiceStatus(msg){ const el=$("voiceStatus"); if(el){ el.textContent=msg||""; el.hidden=!msg; } }
+function stopKeepAlive(){ if(keepAlive){clearInterval(keepAlive);keepAlive=null;} }
+function stopVoice(){
+ speechToken++; stopKeepAlive(); activeUtterances=[];
+ if(synth) synth.cancel();
+ playingScene=false; $("playSceneBtn").textContent="Play scene dialogue";
+}
+function getVoice(){
+ const voices=loadVoices();
+ return voices.find(v=>/en[-_]GB/i.test(v.lang)&&/female|serena|kate|amy|libby|sonia|google uk english female/i.test(v.name))
+   ||voices.find(v=>/en[-_]GB/i.test(v.lang))||voices.find(v=>/^en/i.test(v.lang))||null;
+}
+// Split long lines into sentence-sized chunks (<= ~160 chars) so no single utterance runs past Chrome's cutoff
+function chunkText(text,max=160){
+ const parts=text.match(/[^.!?;:]+[.!?;:]*\s*/g)||[text]; const out=[]; let cur="";
+ for(const p of parts){
+  if((cur+p).length>max&&cur){out.push(cur.trim());cur="";}
+  if(p.length>max){ // very long sentence: break on commas / spaces
+   let rest=p; while(rest.length>max){ let cut=rest.lastIndexOf(",",max); if(cut<40) cut=rest.lastIndexOf(" ",max); if(cut<1) cut=max; out.push(rest.slice(0,cut+1).trim()); rest=rest.slice(cut+1); }
+   cur+=rest;
+  } else cur+=p;
+ }
+ if(cur.trim()) out.push(cur.trim());
+ return out;
+}
+async function speakCurrent(onend){
+ if(!voiceOn){ if(onend) onend(); return; }
+ if(!synth||typeof SpeechSynthesisUtterance==="undefined"){
+  voiceStatus("Voice isn't supported in this browser. Try Chrome, Edge or Safari."); if(onend) onend(); return;
+ }
+ // cancel any current speech, but remember this request's token
+ speechToken++; const myToken=speechToken; stopKeepAlive(); activeUtterances=[]; synth.cancel();
+ await waitForVoices();
+ if(myToken!==speechToken) return;
+ if(!loadVoices().length) voiceStatus("No speech voices were found on this device. Install a text-to-speech voice (e.g. English UK) in your device settings.");
+ else voiceStatus("");
+ const l=scenes[sceneIndex].lines[lineIndex];
+ const chunks=chunkText((l[0]==="JAMIL"?"Jamil says. ":"Instructor says. ")+l[1]);
+ const v=getVoice();
+ let i=0, finished=false;
+ const done=()=>{ if(finished) return; finished=true; stopKeepAlive(); activeUtterances=[]; if(myToken===speechToken&&onend) onend(); };
+ const speakNext=()=>{
+  if(myToken!==speechToken) return;
+  if(i>=chunks.length) return done();
+  const u=new SpeechSynthesisUtterance(chunks[i++]);
+  u.lang="en-GB"; u.rate=0.91; u.pitch=l[0]==="JAMIL"?1.03:0.94; if(v) u.voice=v;
+  u.onend=()=>speakNext();
+  u.onerror=e=>{
+   if(e&&(e.error==="interrupted"||e.error==="canceled")) return; // caused by our own stop
+   if(e&&e.error==="not-allowed") voiceStatus("Your browser blocked speech. Tap ▶ Speak line once to allow audio.");
+   speakNext(); // skip the failed chunk instead of stalling the scene
+  };
+  activeUtterances.push(u);
+  if(synth.paused) synth.resume();
+  synth.speak(u);
+ };
+ // Chrome drops a speak() issued in the same tick as cancel(); give it a moment
+ setTimeout(()=>{
+  if(myToken!==speechToken) return;
+  speakNext();
+ },120);
 }
 function nextLine(autoSpeak=false){
  if(lineIndex<scenes[sceneIndex].lines.length-1){lineIndex++;renderLine();if(autoSpeak)speakCurrent(()=>{if(playingScene)setTimeout(()=>nextLine(true),500);});}
@@ -84,4 +144,3 @@ $("voiceToggle").onclick=()=>{voiceOn=!voiceOn;$("voiceToggle").textContent="Voi
 $("playSceneBtn").onclick=()=>{stopVoice();playingScene=true;$("playSceneBtn").textContent="Playing scene…";speakCurrent(()=>{if(playingScene)nextLine(true);});};
 $("nextSceneBtn").onclick=()=>{stopVoice();sceneIndex=(sceneIndex+1)%scenes.length;lineIndex=0;renderAll();};
 renderAll();
-if(synth)synth.onvoiceschanged=()=>{};
