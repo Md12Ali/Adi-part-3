@@ -1,31 +1,48 @@
-# ADI Part 3 — Jamil Lesson Simulator
+# ADI Part 3 — Standards Check Study Guide
 
-A self-contained browser-based animated practice project based on the supplied:
-- `ADI Part 3 Enhanced Master Lesson Plan.pdf`
-- `ADI Part 3.docx`
+Interactive study and reference guide for the DVSA ADI Part 3 / Standards Check.
 
-## Run it
-1. Extract the ZIP.
-2. Open `index.html` in Chrome, Edge or another modern browser.
-3. Choose a scene from the right-hand list.
-4. Use **Speak line** to hear one line, or **Play scene dialogue** to play the dialogue in that scene.
-5. Use **Voice: Off** to mute narration. Browser/device speech voices vary; select an English (United Kingdom) voice in your device settings if available.
+- **Instructor:** Mohammed · **Pupil:** Jamil
+- **Topic:** Meeting oncoming traffic on narrow roads with parked vehicles
+- **Target:** Grade A (43+/51) with at least 8/15 in Risk Management
 
-## What it includes
-- Eight lesson scenes, with planned scene timings totalling 32 minutes.
-- British English dialogue and subtitles.
-- An animated stylised UK road scene, parked vehicles, oncoming vehicle and dual-control car.
-- Lesson planning, safety agreement, guided practice, blind-bend intervention, FCPS analysis, reattempt, pupil-led practice and debrief.
-- Scene navigation and line-by-line practice.
+Live site: https://adi-part-3.onrender.com
 
-## Important limitations
-- This is a stylised browser animation, not photorealistic 3D and not an MP4 video export.
-- The scene timings are learning-plan allocations; the project does not force each scene to run for its full allocated time.
-- Speech synthesis is provided by the browser and may not have a natural British voice installed.
-- This is a practice aid, not an official DVSA product or a guarantee of an exam grade.
-- The supplied source documents contain some route-name and wording inconsistencies. This project focuses on the lesson structure and dialogue rather than treating every route direction as verified.
+## Sections
+
+1. **Dashboard** — DVSA score breakdown (Lesson Planning 12, Risk Management 15, Teaching & Learning 24), grade bands, core principles (pupil-centred learning, FCPS, dynamic risk management).
+2. **Lesson Plan & Script** — 4 phases with the full Mohammed/Jamil dialogue, SMART goal, confidence scale (5 → 7 → 8), interactive priority diagram, 23 m / 46 m stopping distances, dual-control protocol, and the three route levels with exact road names. Every block has a copy button.
+3. **Video Guide** — 12 animated scenes with camera, lighting and a ready-to-paste AI prompt. Paste an MP4, YouTube or Vimeo link into any scene to play your rendered clip (saved in your browser).
+4. **Examiner Checklist** — all 17 DVSA competencies with lesson-specific evidence and 0–3 self-scoring, live total, grade and Risk Management auto-fail check.
+
+English, Bengali (বাংলা) or both side by side; light/dark mode; mobile-friendly.
 
 ## Files
-- `index.html` — interface
-- `style.css` — layout and animated road scene
-- `script.js` — dialogue, scene navigation and browser speech
+
+```
+index.html            page shell
+assets/data.js        all lesson content (edit this to change scripts, routes, scenes)
+assets/app.js         app logic
+assets/styles.css     compiled Tailwind CSS (committed, so no build is needed to deploy)
+src/input.css         Tailwind source
+tailwind.config.js    Tailwind config
+```
+
+## Editing styles
+
+If you add new Tailwind classes, rebuild the CSS:
+
+```bash
+npm install
+npm run build:css      # or: npm run watch:css while editing
+```
+
+## Deploying
+
+**Render (current):** Static Site → repo `Md12Ali/Adi-part-3`, branch `main`, build command `echo static`, publish directory `./`.
+Optional: set the build command to `npm install && npm run build:css` to rebuild the CSS on every deploy.
+
+**GitHub Pages:** Settings → Pages → Deploy from branch → `main` / root.
+
+---
+Personal study aid. Not an official DVSA product. Scoring per the DVSA standards check form; stopping distances per the Highway Code.

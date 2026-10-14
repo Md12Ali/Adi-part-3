@@ -1,0 +1,13 @@
+{
+  "name": "adi-part-3-study-guide",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ADI Part 3 (Standards Check) study guide — Mohammed & Jamil, meeting traffic on narrow roads.",
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/input.css -o ./assets/styles.css --minify",
+    "watch:css": "tailwindcss -i ./src/input.css -o ./assets/styles.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.13"
+  }
+}
