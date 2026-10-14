@@ -25,6 +25,7 @@
   /* ---------------- i18n helpers ---------------- */
   const UI = {
     dashboard: { en: "Dashboard", bn: "ড্যাশবোর্ড" },
+    exam: { en: "Exam Day", bn: "পরীক্ষার দিন" },
     lesson: { en: "Lesson Plan & Script", bn: "লেসন প্ল্যান ও স্ক্রিপ্ট" },
     videos: { en: "Video Guide", bn: "ভিডিও গাইড" },
     checklist: { en: "Examiner Checklist", bn: "এক্সামিনার চেকলিস্ট" },
@@ -214,9 +215,12 @@
           <div class="flex flex-wrap items-end justify-between gap-2">
             <div>
               <p class="eyebrow">${isBn() ? "এক নজরে লেসন" : "Lesson at a glance"}</p>
-              <h2 class="h2 mt-1">${isBn() ? "৪ ফেজ · আত্মবিশ্বাস ৫ → ৮" : "4 phases · confidence 5 → 8"}</h2>
+              <h2 class="h2 mt-1">${isBn() ? "৪ ফেজ · ৪৫ মিনিট · আত্মবিশ্বাস ৫ → ৮" : "4 phases · 45 minutes · confidence 5 → 8"}</h2>
             </div>
-            <a href="#lesson" class="btn btn-primary">${isBn() ? "পুরো স্ক্রিপ্ট দেখুন" : "Open full script"} ${I.arrow.replace("text-slate-400", "text-white")}</a>
+            <div class="flex flex-wrap gap-2">
+              <a href="#lesson" class="btn">${isBn() ? "পুরো স্ক্রিপ্ট" : "Full script"}</a>
+              <a href="#exam" class="btn btn-primary">${isBn() ? "পরীক্ষার দিনের রান-শিট" : "Exam-day run sheet"} ${I.arrow.replace("text-slate-400", "text-white")}</a>
+            </div>
           </div>
           <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">${timeline}</div>
         </section>
@@ -228,7 +232,8 @@
      ================================================================ */
   const SPEAKER = {
     M: { name: "Mohammed", init: "M", av: "bg-blue-600 text-white" },
-    J: { name: "Jamil", init: "J", av: "bg-slate-700 text-white dark:bg-slate-600" }
+    J: { name: "Jamil", init: "J", av: "bg-slate-700 text-white dark:bg-slate-600" },
+    E: { name: "Examiner", init: "E", av: "bg-amber-500 text-white" }
   };
   const FCPS_LABEL = { F: "Fault", C: "Cause", P: "Problem / risk", S: "Solution" };
   const FCPS_BN = { F: "ভুল", C: "কারণ", P: "ঝুঁকি", S: "সমাধান" };
@@ -242,6 +247,9 @@
     const s = SPEAKER[sp];
     const right = sp === "J";
     const badge = f ? `<span class="ml-2 inline-flex items-center gap-1 rounded-full ${FCPS_CLS[f]} px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-white">${f} · ${isBn() ? `<span lang="bn">${FCPS_BN[f]}</span>` : FCPS_LABEL[f]}</span>` : "";
+    if (sp === "E") {
+      return `<li class="flex items-start gap-2.5"><span class="avatar ${s.av}" aria-hidden="true">E</span><p class="rounded-2xl rounded-tl-md bg-amber-50 px-4 py-2.5 text-sm italic text-amber-900 dark:bg-amber-950/40 dark:text-amber-100">${text}</p></li>`;
+    }
     return `<li class="flex items-start gap-2.5 ${right ? "flex-row-reverse" : ""}">
       <span class="avatar ${s.av}" aria-hidden="true">${s.init}</span>
       <div class="min-w-0 ${right ? "text-right" : ""}">
@@ -638,9 +646,278 @@
   }
 
   /* ================================================================
+     EXAM DAY — run sheet + rehearsal
+     ================================================================ */
+  const X = window.EXAM;
+  const LEVEL_CLS = {
+    1: { badge: "bg-sky-500", text: "text-sky-700 dark:text-sky-300", line: "bg-sky-200 dark:bg-sky-900" },
+    2: { badge: "bg-violet-500", text: "text-violet-700 dark:text-violet-300", line: "bg-violet-200 dark:bg-violet-900" },
+    3: { badge: "bg-emerald-500", text: "text-emerald-700 dark:text-emerald-300", line: "bg-emerald-200 dark:bg-emerald-900" }
+  };
+  state.examMode = store.get("adi3-exam-mode", "read");
+  state.ticks = new Set(store.get("adi3-ticks", []));
+  state.deckFilter = store.get("adi3-deck-filter", "all");
+  state.deckIdx = 0;
+  state.reveal = false;
+  let timerStart = null, timerIv = null;
+
+  const sayBubble = (text, label) => `<div class="flex items-start gap-2"><span class="avatar bg-blue-600 text-white" aria-hidden="true">M</span><div class="min-w-0"><p class="mb-1 text-[11px] font-bold uppercase tracking-wide text-slate-400">${label || "Say"}</p><p class="bubble bubble-m">${text}</p></div></div>`;
+  const miniList = (label, arr, cls) => arr && arr.length ? `<div class="mt-3"><p class="text-[11px] font-bold uppercase tracking-wide ${cls || "text-slate-400"}">${label}</p><ul class="mt-1.5 grid gap-1.5">${arr.map((q) => `<li class="flex gap-2 text-sm"><span class="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500"></span><span>“${q}”</span></li>`).join("")}</ul></div>` : "";
+  const tipBox = (o) => o ? `<div class="mt-4 flex gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100"><span class="shrink-0">💡</span><div>${T(o)}</div></div>` : "";
+  const stageHead = (icon, title, time, id, copyKey) => `
+    <div class="flex flex-wrap items-center gap-3">
+      <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-slate-900 text-xl dark:bg-slate-800" aria-hidden="true">${icon}</span>
+      <h3 class="min-w-0 flex-1 text-lg font-extrabold leading-snug text-slate-900 sm:text-xl dark:text-white">${T(title)}</h3>
+      <div class="flex w-full items-center gap-2 pl-14 sm:w-auto sm:pl-0">
+        ${time ? `<span class="chip">⏱ ${time}</span>` : ""}
+        ${copyKey ? `<button type="button" class="btn" data-copy="${copyKey}">${I.copy}${t1(UI.copy)}</button>` : ""}
+      </div>
+    </div>`;
+
+  function stepHTML(s) {
+    const L = LEVEL_CLS[s.level];
+    const bend = s.branch ? `
+      <div class="mt-4 grid gap-3 lg:grid-cols-2">
+        ${["fault", "good"].map((k) => `<div class="rounded-xl border ${k === "fault" ? "border-rose-200 dark:border-rose-900" : "border-emerald-200 dark:border-emerald-900"} p-3">
+          <p class="mb-3 text-sm font-bold ${k === "fault" ? "text-rose-700 dark:text-rose-300" : "text-emerald-700 dark:text-emerald-300"}">${k === "fault" ? "⚠️" : "✅"} ${T(X.bend[k].title)}</p>
+          <ol class="space-y-3">${X.bend[k].lines.map(lineHTML).join("")}</ol></div>`).join("")}
+      </div>` : "";
+    return `<li class="relative flex gap-3 pb-6 last:pb-0">
+      <span class="absolute left-[15px] top-9 bottom-0 w-0.5 ${L.line}" aria-hidden="true"></span>
+      <span class="relative z-10 grid h-8 w-8 shrink-0 place-items-center rounded-full ${L.badge} text-xs font-extrabold text-white">${s.n}</span>
+      <div class="min-w-0 flex-1">
+        <p class="pt-1 font-extrabold text-slate-900 dark:text-white">${s.road}</p>
+        <p class="mt-0.5 text-sm text-slate-600 dark:text-slate-300">${T(s.focus)}</p>
+        <div class="mt-3">${sayBubble(s.dir, isBn() ? "দিকনির্দেশনা" : "Direction")}</div>
+        ${miniList(isBn() ? "জিজ্ঞেস করুন" : "Ask", s.say)}
+        ${miniList(isBn() ? "অপেক্ষার সময়" : "While waiting", s.wait, "text-amber-600 dark:text-amber-400")}
+        ${miniList(isBn() ? "মোড়ের পরে" : "After the turn", s.after)}
+        ${s.jamil ? `<p class="mt-3 text-sm text-slate-500 dark:text-slate-400"><b class="text-slate-600 dark:text-slate-300">${isBn() ? "জামিলের সম্ভাব্য উত্তর:" : "Jamil might say:"}</b> “${s.jamil}”</p>` : ""}
+        ${s.praise ? `<p class="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200"><b>${isBn() ? "প্রশংসা:" : "Praise:"}</b> “${s.praise}”</p>` : ""}
+        ${s.note ? `<p class="mt-2 text-xs font-semibold text-amber-700 dark:text-amber-400">⚑ ${T(s.note)}</p>` : ""}
+        ${bend}
+      </div>
+    </li>`;
+  }
+
+  function checklistHTML(c, si, ci) {
+    return `<div class="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
+      <p class="text-sm font-bold text-slate-900 dark:text-white">${T(c.title)}</p>
+      <ul class="mt-3 grid gap-2">${c.items.map((it, ii) => {
+        const id = `${si}-${ci}-${ii}`; const on = state.ticks.has(id);
+        return `<li><button type="button" data-tick="${id}" aria-pressed="${on}" class="flex w-full items-start gap-2.5 rounded-lg p-1.5 text-left text-sm transition hover:bg-slate-50 dark:hover:bg-slate-800/60">
+          <span class="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-md border ${on ? "border-emerald-600 bg-emerald-600 text-white" : "border-slate-300 dark:border-slate-600"}">${on ? I.check : ""}</span>
+          <span class="${on ? "text-slate-400 line-through" : ""}">${T(it)}</span></button></li>`;
+      }).join("")}</ul></div>`;
+  }
+
+  function renderExamRead() {
+    const before = X.stages[0], arrive = X.stages[1], intro = X.stages[2];
+    const levels = [1, 2, 3].map((lv) => `
+      <section class="card scroll-mt-44 p-5 sm:p-7" id="exam-l${lv}">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="rounded-lg ${LEVEL_CLS[lv].badge} px-2.5 py-1 text-xs font-extrabold text-white">${isBn() ? "রুট" : "Route"}</span>
+          <h3 class="flex-1 text-lg font-extrabold text-slate-900 dark:text-white">${t1(X.levels[lv])}</h3>
+          <button type="button" class="btn" data-copy="exam:l${lv}">${I.copy}${t1(UI.copy)}</button>
+        </div>
+        <div class="mt-3">${routeHTML(X.route.filter((s) => s.level === lv).map((s) => s.road))}</div>
+        <ol class="mt-6">${X.route.filter((s) => s.level === lv).map(stepHTML).join("")}</ol>
+      </section>`).join("");
+
+    return `
+      <div class="grid grid-cols-1 gap-6">
+        <section class="card scroll-mt-44 p-5 sm:p-7" id="exam-rules">
+          <p class="eyebrow">${isBn() ? "গ্রেড এ-র ১০টি নিয়ম" : "10 rules for a Grade A"}</p>
+          <ol class="mt-4 grid gap-3 md:grid-cols-2">${X.golden.map((g, i) => `<li class="flex gap-3"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-blue-600 text-xs font-extrabold text-white">${i + 1}</span><p class="text-sm">${T(g)}${g.src ? ` <span class="chip ml-1 align-middle">${g.src}</span>` : ""}</p></li>`).join("")}</ol>
+        </section>
+
+        <section class="card scroll-mt-44 p-5 sm:p-7" id="exam-before">
+          ${stageHead(before.icon, before.title, before.time)}
+          <p class="mt-3 text-sm text-slate-600 dark:text-slate-300">${T(before.intro)}</p>
+          <div class="mt-4 grid gap-3 lg:grid-cols-3">${before.checklists.map((c, ci) => checklistHTML(c, 0, ci)).join("")}</div>
+        </section>
+
+        <section class="card scroll-mt-44 p-5 sm:p-7" id="exam-arrive">
+          ${stageHead(arrive.icon, arrive.title, arrive.time, "arrive", "exam:arrive")}
+          <p class="mt-3 text-sm text-slate-600 dark:text-slate-300">${T(arrive.intro)}</p>
+          <ol class="mt-5 space-y-3">${arrive.lines.map(lineHTML).join("")}</ol>
+          ${tipBox(arrive.tip)}
+        </section>
+
+        <section class="card scroll-mt-44 p-5 sm:p-7" id="exam-intro">
+          ${stageHead(intro.icon, intro.title, intro.time, "intro", "exam:intro")}
+          <p class="mt-3 text-sm text-slate-600 dark:text-slate-300">${T(intro.intro)}</p>
+          <div class="mt-4 flex flex-wrap items-center gap-3 rounded-xl bg-slate-900 p-3 text-white dark:bg-slate-800">
+            <span class="text-xs font-semibold text-slate-300">${isBn() ? "প্র্যাকটিস টাইমার" : "Practice timer"}</span>
+            <span id="introTimer" class="font-mono text-2xl font-extrabold tabular-nums">0:00</span>
+            <span class="text-xs text-slate-400">/ 3:00</span>
+            <span class="flex-1"></span>
+            <button type="button" class="btn" data-timer="toggle">${timerIv ? (isBn() ? "থামান" : "Pause") : (isBn() ? "শুরু" : "Start")}</button>
+            <button type="button" class="btn" data-timer="reset">${isBn() ? "রিসেট" : "Reset"}</button>
+          </div>
+          <ol class="mt-5 space-y-3">${intro.lines.map(lineHTML).join("")}</ol>
+          ${tipBox(intro.tip)}
+        </section>
+
+        ${levels}
+
+        <section class="card scroll-mt-44 p-5 sm:p-7" id="exam-debrief">
+          ${stageHead("🪞", X.debrief.title, "≤ 3 min", "debrief", "exam:debrief")}
+          <p class="mt-3 text-sm text-slate-600 dark:text-slate-300">${T(X.debrief.intro)}</p>
+          <ol class="mt-5 space-y-3">${X.debrief.lines.map(lineHTML).join("")}</ol>
+          ${tipBox(X.debrief.tip)}
+        </section>
+
+        <section class="card scroll-mt-44 p-5 sm:p-7" id="exam-after">
+          ${stageHead("🏆", X.after.title, "")}
+          <ul class="mt-4 grid gap-2">${X.after.items.map((it) => `<li class="flex gap-2 text-sm"><span class="mt-0.5 text-emerald-600 dark:text-emerald-400">${I.check}</span><span>${T(it)}</span></li>`).join("")}</ul>
+        </section>
+
+        <section class="scroll-mt-44" id="exam-talk">
+          <p class="eyebrow">${isBn() ? "থেমে থাকলে বা লম্বা রাস্তায়" : "Stopped, waiting or on a long road"}</p>
+          <h3 class="h2 mt-1">${isBn() ? "যখন কী বলবেন" : "What to say when…"}</h3>
+          <div class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">${X.talk.map((c) => `
+            <article class="card flex flex-col p-5">
+              <div class="flex items-start gap-3"><span class="text-2xl" aria-hidden="true">${c.icon}</span><h4 class="flex-1 font-bold leading-snug text-slate-900 dark:text-white">${T(c.title)}</h4><button type="button" class="btn" data-copy="talk:${c.id}" aria-label="Copy">${I.copy}</button></div>
+              <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">${T(c.why)}</p>
+              <ul class="mt-3 grid gap-2">${c.lines.map((l) => `<li class="bubble bubble-m text-sm">${l.startsWith("[") ? `<i>${l}</i>` : `“${l}”`}</li>`).join("")}</ul>
+            </article>`).join("")}</div>
+        </section>
+
+        <section class="scroll-mt-44" id="exam-fixes">
+          <p class="eyebrow">${isBn() ? "আপনার স্ক্রিপ্ট" : "Your master script"}</p>
+          <h3 class="h2 mt-1">${isBn() ? "নম্বর বাঁচানোর ৬টি সংশোধন" : "6 fixes that protect your marks"}</h3>
+          <div class="mt-4 grid gap-4 lg:grid-cols-2">${X.fixes.map((f) => `
+            <article class="card p-5">
+              <div class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full ${AREA[f.area].bar}"></span><h4 class="font-bold text-slate-900 dark:text-white">${t1(f.what)}</h4></div>
+              <p class="mt-3 rounded-lg border-l-4 border-rose-400 bg-rose-50 px-3 py-2 text-sm text-rose-900 dark:bg-rose-950/40 dark:text-rose-200"><b>${isBn() ? "আগে:" : "Before:"}</b> ${f.before}</p>
+              <p class="mt-2 rounded-lg border-l-4 border-emerald-500 bg-emerald-50 px-3 py-2 text-sm text-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200"><b>${isBn() ? "পরে:" : "After:"}</b> ${f.after}</p>
+              <p class="mt-3 text-sm text-slate-600 dark:text-slate-300">${T(f.why)}</p>
+            </article>`).join("")}</div>
+        </section>
+      </div>`;
+  }
+
+  /* ---- Rehearsal deck ---- */
+  function buildDeck() {
+    const deck = [];
+    const fromLines = (section, ctxLabel, lines) => {
+      let prev = null;
+      lines.forEach((l) => {
+        if (l[0] === "M") deck.push({ section, ctx: ctxLabel, cue: prev ? (prev[0] === "J" ? { who: "Jamil", text: prev[1] } : prev[0] === "M" ? { who: "you", text: prev[1] } : { text: prev[1] }) : { text: isBn() ? "শুরু করুন" : "You start." }, answer: [l[1]] });
+        prev = l;
+      });
+    };
+    fromLines("arrive", tPlain(X.stages[1].title), X.stages[1].lines);
+    fromLines("intro", tPlain(X.stages[2].title), X.stages[2].lines);
+    X.route.forEach((s) => {
+      const ctx = `${s.n}. ${s.road}`;
+      const sec = `l${s.level}`;
+      deck.push({ section: sec, ctx, cue: { text: (isBn() ? "দিকনির্দেশনা দিন: " : "Give the direction: ") + s.road }, answer: [s.dir] });
+      if (s.say) deck.push({ section: sec, ctx, cue: { text: tPlain(s.focus) }, answer: s.say });
+      if (s.wait) deck.push({ section: sec, ctx, cue: { text: isBn() ? "আপনারা থেমে আছেন। কী বলবেন?" : "You're stopped and waiting. What do you say?" }, answer: s.wait });
+      if (s.after) deck.push({ section: sec, ctx, cue: { text: isBn() ? "মোড়টা শেষ হলো। কী জিজ্ঞেস করবেন?" : "The turn is done. What do you ask?" }, answer: s.after });
+      if (s.praise) deck.push({ section: sec, ctx, cue: { text: isBn() ? "সে এটা ভালোভাবে করল। প্রশংসা করুন।" : "He did it well. Praise him." }, answer: [s.praise] });
+      if (s.branch) fromLines(sec, `${ctx} — ${tPlain(X.bend.fault.title)}`, X.bend.fault.lines);
+    });
+    fromLines("debrief", tPlain(X.debrief.title), X.debrief.lines);
+    X.talk.forEach((c) => deck.push({ section: "talk", ctx: tPlain(c.title), cue: { text: tPlain(c.why) }, answer: c.lines }));
+    return deck.filter((c) => state.deckFilter === "all" || c.section === state.deckFilter);
+  }
+
+  function renderRehearse() {
+    const deck = buildDeck();
+    if (state.deckIdx >= deck.length) state.deckIdx = 0;
+    const c = deck[state.deckIdx];
+    const filters = [["all", isBn() ? "সব" : "All"], ["arrive", isBn() ? "আগমন" : "Arrival"], ["intro", isBn() ? "শুরু" : "Opening"], ["l1", isBn() ? "লেভেল ১" : "Level 1"], ["l2", isBn() ? "লেভেল ২" : "Level 2"], ["l3", isBn() ? "লেভেল ৩" : "Level 3"], ["debrief", isBn() ? "রিফ্লেকশন" : "Reflection"], ["talk", isBn() ? "কী বলব" : "What to say"]];
+    const pct = deck.length ? ((state.deckIdx + 1) / deck.length) * 100 : 0;
+    return `
+      <div class="mx-auto max-w-2xl">
+        <div class="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1" role="group" aria-label="Section">
+          ${filters.map(([k, l]) => `<button type="button" data-deck="${k}" aria-pressed="${state.deckFilter === k}" class="shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${state.deckFilter === k ? "border-blue-600 bg-blue-600 text-white" : "border-slate-200 bg-white text-slate-600 hover:border-blue-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"}">${l}</button>`).join("")}
+        </div>
+        <div class="mt-4 flex items-center gap-3 text-xs font-semibold text-slate-500">
+          <span class="tabular-nums">${state.deckIdx + 1} / ${deck.length}</span>
+          <div class="h-1.5 flex-1 rounded-full bg-slate-200 dark:bg-slate-800"><div class="h-1.5 rounded-full bg-blue-600 transition-all" style="width:${pct}%"></div></div>
+        </div>
+        <article class="card mt-4 overflow-hidden" aria-live="polite">
+          <div class="border-b border-slate-100 bg-slate-50 px-5 py-3 text-xs font-bold uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:bg-slate-900/80">${c ? c.ctx : ""}</div>
+          <div class="p-5 sm:p-7">
+            ${c ? `
+            <p class="text-[11px] font-bold uppercase tracking-wide text-slate-400">${c.cue.who === "Jamil" ? (isBn() ? "জামিল বলছে" : "Jamil says") : c.cue.who === "you" ? (isBn() ? "আপনি এইমাত্র বললেন" : "You just said") : (isBn() ? "পরিস্থিতি" : "Situation")}</p>
+            <p class="mt-2 text-lg font-semibold leading-relaxed text-slate-900 dark:text-white">${c.cue.who ? `“${c.cue.text}”` : c.cue.text}</p>
+            <div class="mt-6 rounded-2xl border-2 border-dashed ${state.reveal ? "border-blue-300 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/40" : "border-slate-200 dark:border-slate-700"} p-4">
+              <p class="text-[11px] font-bold uppercase tracking-wide text-blue-700 dark:text-blue-300">${isBn() ? "আপনি (মোহাম্মদ) বলবেন" : "You (Mohammed) say"}</p>
+              ${state.reveal ? `<ul class="mt-2 grid gap-2">${c.answer.map((a) => `<li class="text-[17px] leading-relaxed text-slate-900 dark:text-white">${a.startsWith("[") ? `<i>${a}</i>` : `“${a}”`}</li>`).join("")}</ul>`
+                : `<button type="button" data-reveal class="mt-2 w-full rounded-xl bg-white py-6 text-sm font-semibold text-slate-500 ring-1 ring-slate-200 transition hover:text-blue-700 dark:bg-slate-900 dark:ring-slate-700">${isBn() ? "আগে জোরে বলুন, তারপর এখানে চাপুন (Space)" : "Say it out loud first, then tap to check (Space)"}</button>`}
+            </div>` : `<p>${isBn() ? "কোনো কার্ড নেই" : "No cards"}</p>`}
+          </div>
+          <div class="flex items-center gap-2 border-t border-slate-100 p-3 dark:border-slate-800">
+            <button type="button" class="btn" data-nav="-1">← ${isBn() ? "আগের" : "Prev"}</button>
+            <span class="flex-1"></span>
+            ${state.reveal ? "" : `<button type="button" class="btn" data-reveal>${isBn() ? "দেখুন" : "Reveal"}</button>`}
+            <button type="button" class="btn btn-primary" data-nav="1">${isBn() ? "পরের" : "Next"} →</button>
+          </div>
+        </article>
+        <p class="mt-3 text-center text-xs text-slate-400">${isBn() ? "কীবোর্ড: ← → নেভিগেট, Space দেখুন" : "Keyboard: ← → to move, Space to reveal"}</p>
+      </div>`;
+  }
+
+  function renderExam() {
+    const nav = [["rules", isBn() ? "নিয়ম" : "Rules"], ["before", isBn() ? "আগের দিন" : "Before"], ["arrive", isBn() ? "আগমন" : "Arrive"], ["intro", isBn() ? "শুরু" : "Opening"], ["l1", isBn() ? "লেভেল ১" : "Level 1"], ["l2", isBn() ? "লেভেল ২" : "Level 2"], ["l3", isBn() ? "লেভেল ৩" : "Level 3"], ["debrief", isBn() ? "রিফ্লেকশন" : "Reflection"], ["talk", isBn() ? "কী বলব" : "What to say"], ["fixes", isBn() ? "সংশোধন" : "Fixes"]];
+    $("#panel-exam").innerHTML = `
+      <div class="mb-5">
+        <p class="eyebrow">${isBn() ? "পরীক্ষার দিন" : "Exam day"}</p>
+        <h2 class="h2 mt-1">${isBn() ? "আগমন থেকে ফলাফল — প্রতিটি কথা, প্রতিটি রাস্তা" : "Arrival to result — every word, every road"}</h2>
+        <p class="mt-2 max-w-3xl text-sm text-slate-600 dark:text-slate-300">${T({ en: "Your master script, turned into a run sheet and timed to DVSA rules. Read it through, then use Rehearse to practise your lines until they're automatic.", bn: "আপনার মাস্টার স্ক্রিপ্ট, DVSA নিয়ম অনুযায়ী সময় মিলিয়ে রান-শিটে সাজানো। পড়ে নিন, তারপর রিহার্স মোডে লাইনগুলো মুখস্থ হওয়া পর্যন্ত প্র্যাকটিস করুন।" })}</p>
+        <div class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">${X.timing.map((t) => `<div class="rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900"><p class="text-xl font-extrabold text-slate-900 dark:text-white">${t.k}</p><p class="text-xs text-slate-500 dark:text-slate-400">${t1(t)}</p></div>`).join("")}</div>
+        <div class="mt-4 inline-flex rounded-xl border border-slate-200 bg-slate-100 p-1 text-sm font-semibold dark:border-slate-700 dark:bg-slate-800" role="group" aria-label="Mode">
+          <button type="button" data-xmode="read" aria-pressed="${state.examMode === "read"}" class="rounded-lg px-4 py-2 ${state.examMode === "read" ? "bg-white text-blue-700 shadow-sm dark:bg-slate-950 dark:text-blue-300" : "text-slate-500"}">📖 ${isBn() ? "পড়ুন" : "Read"}</button>
+          <button type="button" data-xmode="rehearse" aria-pressed="${state.examMode === "rehearse"}" class="rounded-lg px-4 py-2 ${state.examMode === "rehearse" ? "bg-white text-blue-700 shadow-sm dark:bg-slate-950 dark:text-blue-300" : "text-slate-500"}">🎙️ ${isBn() ? "রিহার্স" : "Rehearse"}</button>
+        </div>
+        ${state.examMode === "read" ? `<button type="button" class="btn btn-primary ml-2 align-top" data-copy="exam:all">${I.copy}${isBn() ? "পুরো রান-শিট কপি" : "Copy full run sheet"}</button>` : ""}
+      </div>
+      ${state.examMode === "read" ? `
+        <nav class="no-scrollbar sticky top-[106px] z-20 -mx-4 mb-5 flex gap-2 overflow-x-auto bg-slate-50/90 px-4 py-2 backdrop-blur dark:bg-slate-950/90" aria-label="Exam stages">
+          ${nav.map(([k, l]) => `<a href="#exam/${k}" class="shrink-0 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-blue-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">${l}</a>`).join("")}
+        </nav>
+        ${renderExamRead()}` : renderRehearse()}`;
+    updateTimer();
+  }
+
+  function updateTimer() {
+    const el = $("#introTimer");
+    if (!el) return;
+    const sec = timerStart ? Math.floor((Date.now() - timerStart.t0) / 1000) + timerStart.acc : (state.timerAcc || 0);
+    el.textContent = `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
+    el.className = `font-mono text-2xl font-extrabold tabular-nums ${sec >= 180 ? "text-rose-400" : sec >= 150 ? "text-amber-300" : ""}`;
+  }
+
+  function examText(part) {
+    const L = (lines) => lines.map((l) => (l[0] === "N" ? `[${l[1]}]` : `${{ M: "MOHAMMED", J: "JAMIL", E: "EXAMINER" }[l[0]]}: ${l[1]}`)).join("\n");
+    const step = (s) => {
+      let o = `${s.n}. ${s.road}\n   SAY: ${s.dir}\n   FOCUS: ${s.focus.en}`;
+      if (s.say) o += `\n   ASK: ${s.say.join(" / ")}`;
+      if (s.wait) o += `\n   WHILE WAITING: ${s.wait.join(" / ")}`;
+      if (s.after) o += `\n   AFTER: ${s.after.join(" / ")}`;
+      if (s.praise) o += `\n   PRAISE: ${s.praise}`;
+      if (s.branch) o += `\n   IF FAULT:\n${L(X.bend.fault.lines)}\n   IF GOOD:\n${L(X.bend.good.lines)}`;
+      return o;
+    };
+    const lvl = (n) => `${X.levels[n].en.toUpperCase()}\n${X.route.filter((s) => s.level === n).map(step).join("\n")}`;
+    if (part === "arrive") return `${X.stages[1].title.en}\n${L(X.stages[1].lines)}`;
+    if (part === "intro") return `${X.stages[2].title.en} (≤ 3 min)\n${L(X.stages[2].lines)}`;
+    if (part === "debrief") return `${X.debrief.title.en}\n${L(X.debrief.lines)}`;
+    if (/^l\d$/.test(part)) return lvl(+part[1]);
+    if (part === "all") return [`ADI PART 3 — EXAM DAY RUN SHEET (Mohammed & Jamil)`, examText("arrive"), examText("intro"), lvl(1), lvl(2), lvl(3), examText("debrief")].join("\n\n");
+    return "";
+  }
+
+  /* ================================================================
      Copy text builders
      ================================================================ */
   const lineText = (l) => (l[0] === "N" ? `[${l[1]}]` : `${SPEAKER[l[0]].name.toUpperCase()}: ${l[1]}`);
+  // (exam texts built by examText)
   const blockText = (b) => `${b.title.en}\n\n${b.lines.map(lineText).join("\n")}`;
   function phaseText(p) {
     let out = `PHASE ${p.num}: ${p.title.en.toUpperCase()} (${p.time})\n\n`;
@@ -661,6 +938,8 @@
     if (kind === "prompt") return promptFor(D.scenes.find((s) => s.n === +a));
     if (kind === "char") { const tag = key.slice(5); const c = D.characters.find((x) => x.tag === tag); return `${c.tag} ${c.en}`; }
     if (kind === "style") return D.style;
+    if (kind === "exam") return examText(a);
+    if (kind === "talk") { const c = X.talk.find((x) => x.id === a); return `${c.title.en}\n${c.lines.map((l) => "- " + l).join("\n")}`; }
     return "";
   }
   async function doCopy(text) {
@@ -686,7 +965,7 @@
   /* ================================================================
      Shell: tabs, language, theme, events
      ================================================================ */
-  const RENDER = { dashboard: renderDashboard, lesson: renderLesson, videos: renderVideos, checklist: renderChecklist };
+  const RENDER = { dashboard: renderDashboard, exam: renderExam, lesson: renderLesson, videos: renderVideos, checklist: renderChecklist };
   function renderChrome() {
     $$("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === state.lang)));
     $$("[data-tab]").forEach((b) => {
@@ -702,7 +981,7 @@
     RENDER[state.tab]();
     renderChrome();
     if (sub) {
-      const el = document.getElementById(`lesson-${sub}`);
+      const el = document.getElementById(`${state.tab}-${sub}`);
       if (el) setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 30);
     } else window.scrollTo({ top: 0 });
   }
@@ -757,6 +1036,19 @@
       return;
     }
     if ("replay" in d) { playScenario(); return; }
+    if (d.xmode) { state.examMode = d.xmode; store.set("adi3-exam-mode", d.xmode); renderExam(); return; }
+    if (d.deck) { state.deckFilter = d.deck; state.deckIdx = 0; state.reveal = false; store.set("adi3-deck-filter", d.deck); renderExam(); return; }
+    if ("reveal" in d) { state.reveal = true; renderExam(); return; }
+    if (d.nav) { const n = buildDeck().length; state.deckIdx = (state.deckIdx + +d.nav + n) % n; state.reveal = false; renderExam(); return; }
+    if (d.tick) { state.ticks.has(d.tick) ? state.ticks.delete(d.tick) : state.ticks.add(d.tick); store.set("adi3-ticks", Array.from(state.ticks)); const y = window.scrollY; renderExam(); window.scrollTo({ top: y }); return; }
+    if (d.timer) {
+      if (d.timer === "reset") { clearInterval(timerIv); timerIv = null; timerStart = null; state.timerAcc = 0; }
+      else if (timerIv) { state.timerAcc = Math.floor((Date.now() - timerStart.t0) / 1000) + timerStart.acc; clearInterval(timerIv); timerIv = null; timerStart = null; }
+      else { timerStart = { t0: Date.now(), acc: state.timerAcc || 0 }; timerIv = setInterval(updateTimer, 250); }
+      const tb = $('[data-timer="toggle"]');
+      if (tb) tb.textContent = timerIv ? (isBn() ? "থামান" : "Pause") : (isBn() ? "শুরু" : "Start");
+      updateTimer(); return;
+    }
     if (d.filter) { state.phaseFilter = d.filter; renderVideos(); return; }
     if (d.videoClear) {
       const n = +d.videoClear;
@@ -801,6 +1093,16 @@
     const next = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
     location.hash = next.dataset.tab;
     next.focus();
+  });
+
+  // Rehearse mode keyboard: ←/→ move, Space/Enter reveal
+  document.addEventListener("keydown", (e) => {
+    if (state.tab !== "exam" || state.examMode !== "rehearse") return;
+    if (e.target.closest("input, textarea, [role=tablist]")) return;
+    const n = buildDeck().length;
+    if (e.key === "ArrowRight") { state.deckIdx = (state.deckIdx + 1) % n; state.reveal = false; renderExam(); e.preventDefault(); }
+    else if (e.key === "ArrowLeft") { state.deckIdx = (state.deckIdx - 1 + n) % n; state.reveal = false; renderExam(); e.preventDefault(); }
+    else if ((e.key === " " || e.key === "Enter") && !state.reveal && !e.target.closest("button")) { state.reveal = true; renderExam(); e.preventDefault(); }
   });
 
   window.addEventListener("hashchange", fromHash);

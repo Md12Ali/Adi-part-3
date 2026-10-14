@@ -46,6 +46,7 @@
     <nav class="mx-auto max-w-6xl px-4" aria-label="Sections">
       <div id="tabs" role="tablist" class="no-scrollbar -mb-px flex gap-1 overflow-x-auto">
         <button role="tab" data-tab="dashboard" class="tab">Dashboard</button>
+        <button role="tab" data-tab="exam" class="tab">Exam Day</button>
         <button role="tab" data-tab="lesson" class="tab">Lesson Plan &amp; Script</button>
         <button role="tab" data-tab="videos" class="tab">Video Guide</button>
         <button role="tab" data-tab="checklist" class="tab">Examiner Checklist</button>
@@ -55,6 +56,7 @@
 
   <main id="main" class="mx-auto max-w-6xl px-4 pb-24 pt-6 sm:pt-8">
     <section id="panel-dashboard" role="tabpanel" class="panel"></section>
+    <section id="panel-exam" role="tabpanel" class="panel" hidden></section>
     <section id="panel-lesson" role="tabpanel" class="panel" hidden></section>
     <section id="panel-videos" role="tabpanel" class="panel" hidden></section>
     <section id="panel-checklist" role="tabpanel" class="panel" hidden></section>
@@ -69,6 +71,7 @@
   <div id="toast" role="status" aria-live="polite" class="toast"></div>
 
   <script src="assets/data.js"></script>
+  <script src="assets/examday.js"></script>
   <script src="assets/app.js"></script>
 </body>
 </html>

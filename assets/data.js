@@ -31,6 +31,8 @@ window.ADI = {
         bn: "১৭টি দক্ষতার প্রতিটিতে ০ থেকে ৩ নম্বর — মোট সর্বোচ্চ ৫১।" },
       { en: "Risk Management of 7 or less (out of 15) is an automatic fail, whatever the total. Aim for 8+, ideally 12+.",
         bn: "মোট নম্বর যাই হোক, রিস্ক ম্যানেজমেন্টে ৭ বা তার কম পেলে সরাসরি ফেল। কমপক্ষে ৮, ভালো হয় ১২+।" },
+      { en: "Timing (gov.uk): about 45-minute lesson. Goals and risk agreement no more than 3 minutes, Jamil drives about 40 minutes, his reflection no more than 3 minutes.",
+        bn: "সময় (gov.uk): প্রায় ৪৫ মিনিটের লেসন। লক্ষ্য ও ঝুঁকি চুক্তি ৩ মিনিটের বেশি নয়, জামিল প্রায় ৪০ মিনিট ড্রাইভ করবে, শেষের রিফ্লেকশন ৩ মিনিটের বেশি নয়।" },
       { en: "The examiner can also stop the lesson (automatic fail) if anyone is put in danger.",
         bn: "কাউকে বিপদে ফেললে এক্সামিনার লেসন থামিয়ে দিতে পারেন — সেটাও সরাসরি ফেল।" }
     ]
@@ -90,7 +92,7 @@ window.ADI = {
       id: "p1",
       num: 1,
       title: { en: "Recap & SMART goal setting", bn: "রিক্যাপ ও স্মার্ট (SMART) লক্ষ্য নির্ধারণ" },
-      time: "2–3 min",
+      time: "≈ 1.5 min",
       area: "Lesson Planning",
       summary: {
         en: "Find out what Jamil did last time, what he wants from today, and agree a SMART goal together. Use a confidence scale so progress can be measured at the end.",
@@ -137,7 +139,7 @@ window.ADI = {
       id: "p2",
       num: 2,
       title: { en: "Interactive briefing & risk agreement", bn: "ইন্টারঅ্যাক্টিভ ব্রিফিং ও ঝুঁকি চুক্তি" },
-      time: "3–4 min",
+      time: "≈ 1.5 min",
       area: "Risk Management",
       summary: {
         en: "Use a quick diagram to agree priority rules, clearance and wet-weather stopping distances. Agree exactly how responsibility for risk is shared and how the dual controls will be used.",
@@ -201,15 +203,15 @@ window.ADI = {
       id: "p3",
       num: 3,
       title: { en: "Core driving phase", bn: "মূল ড্রাইভিং পর্ব" },
-      time: "15–20 min",
+      time: "≈ 40 min",
       area: "Risk Management · Teaching & Learning",
       summary: {
         en: "Three levels of instruction, each on its own route. Reduce help as Jamil's decisions improve — and step back up after the blind-bend fault at Trenance Gardens.",
         bn: "তিন ধাপের নির্দেশনা, প্রতিটির নিজস্ব রুট। জামিলের সিদ্ধান্ত যত ভালো হবে, সাহায্য তত কমবে — আর ট্রেনান্স গার্ডেন্সের ব্লাইন্ড বেন্ডের ভুলের পরে আবার সাহায্য বাড়ান।"
       },
       routeNote: {
-        en: "Road names follow your planned route. Confirm each left/right turn on your own route drive before the test — directions are given here without turn instructions on purpose.",
-        bn: "রাস্তার নাম আপনার পরিকল্পিত রুট অনুযায়ী। পরীক্ষার আগে নিজে রুটটি ড্রাইভ করে প্রতিটি বাম/ডান মোড় নিশ্চিত করুন — এখানে ইচ্ছাকৃতভাবে মোড়ের দিক দেওয়া হয়নি।"
+        en: "This tab is the teaching script. Every turn, with exact directions, is in the Exam Day tab. Confirm road names on your dry run.",
+        bn: "এই ট্যাবটি টিচিং স্ক্রিপ্ট। প্রতিটি মোড় ও সঠিক দিকনির্দেশনা 'পরীক্ষার দিন' ট্যাবে। ড্রাই রানে রাস্তার নাম মিলিয়ে নিন।"
       },
       levels: [
         {
@@ -217,7 +219,7 @@ window.ADI = {
           level: 1,
           name: { en: "Full prompting", bn: "সম্পূর্ণ প্রম্পটিং" },
           desc: { en: "Mohammed talks Jamil through each meeting situation with questions and prompts.", bn: "মোহাম্মদ প্রতিটি পরিস্থিতিতে প্রশ্ন ও প্রম্পট দিয়ে জামিলকে গাইড করেন।" },
-          route: ["Kildowan Road", "Granton Road", "Green Lane", "Goodmayes Lane", "Trenance Gardens"],
+          route: ["Kildowan Road", "Granton Road", "Green Lane", "Goodmayes Lane", "Trenance Gardens", "Westrow Gardens", "Levett Gardens", "Goodmayes Lane", "Terence Road", "Westrow Gardens", "Levett Gardens"],
           blocks: [
             {
               title: { en: "Kildowan Road → Granton Road → Green Lane: prompted scanning", bn: "কিলডোয়ান রোড → গ্র্যান্টন রোড → গ্রিন লেন: প্রম্পট সহ স্ক্যানিং" },
@@ -287,10 +289,10 @@ window.ADI = {
           level: 2,
           name: { en: "Shared responsibility", bn: "যৌথ দায়িত্ব" },
           desc: { en: "Mohammed asks questions; Jamil makes and explains his own decisions. Prompts only when needed.", bn: "মোহাম্মদ প্রশ্ন করেন; জামিল নিজের সিদ্ধান্ত নেয় ও ব্যাখ্যা করে। প্রয়োজন হলেই কেবল প্রম্পট।" },
-          route: ["Westrow Gardens", "Levett Gardens", "Gyllyngdune Gardens", "Beamere Road", "Oakwood Gardens", "Green Lane", "New Road", "High Road", "Cameron Road", "Aldborough Road South", "Ward Road", "Mafeking Avenue"],
+          route: ["Gyllyngdune Gardens", "Beamere Road", "Oakwood Gardens", "Green Lane", "New Road", "High Road", "Cameron Road", "Aldborough Road South", "Ward Road", "Mafeking Avenue"],
           blocks: [
             {
-              title: { en: "Westrow Gardens → Levett Gardens → Gyllyngdune Gardens: applying the FCPS solution", bn: "ওয়েস্ট্রো গার্ডেন্স → লেভেট গার্ডেন্স → গিলিংডিউন গার্ডেন্স: FCPS সমাধান প্রয়োগ" },
+              title: { en: "Gyllyngdune Gardens → Beamere Road → Oakwood Gardens: applying the FCPS solution", bn: "গিলিংডিউন গার্ডেন্স → বিমিয়ার রোড → ওকউড গার্ডেন্স: FCPS সমাধান প্রয়োগ" },
               coach: { en: "Let him talk through his plan. Only step in if the plan is unsafe. Check that his Trenance Gardens solution is now being used.", bn: "তাকে নিজের পরিকল্পনা বলতে দিন। পরিকল্পনা অনিরাপদ হলেই কেবল হস্তক্ষেপ করুন। ট্রেনান্স গার্ডেন্সের সমাধান এখন ব্যবহার হচ্ছে কিনা দেখুন।" },
               lines: [
                 ["M", "There's another restricted bend coming up. Talk me through what you'll do."],
@@ -308,10 +310,10 @@ window.ADI = {
               ]
             },
             {
-              title: { en: "Beamere Road → Oakwood Gardens → Green Lane → New Road → High Road", bn: "বিমিয়ার রোড → ওকউড গার্ডেন্স → গ্রিন লেন → নিউ রোড → হাই রোড" },
+              title: { en: "Green Lane → New Road → High Road", bn: "গ্রিন লেন → নিউ রোড → হাই রোড" },
               coach: { en: "Busier roads — keep checking his scanning and mirror use. Use positive, specific feedback (competency 14).", bn: "ব্যস্ত রাস্তা — তার স্ক্যানিং ও মিরর ব্যবহার দেখতে থাকুন। ইতিবাচক ও নির্দিষ্ট ফিডব্যাক দিন (দক্ষতা ১৪)।" },
               lines: [
-                ["M", "The oncoming car on Beamere Road has slowed. What do you need to check before you go?"],
+                ["M", "The oncoming car on New Road has slowed. What do you need to check before you go?"],
                 ["J", "That they're actually waiting for me, that the gap is clear, and that I can pass without making them move."],
                 ["M", "Good. Move through slowly with enough room."],
                 ["J", "I'm through, and the road's opening up."],
@@ -337,10 +339,10 @@ window.ADI = {
           level: 3,
           name: { en: "Independent driving", bn: "স্বাধীন ড্রাইভিং" },
           desc: { en: "Directions only. Jamil plans and commentates. Mohammed observes quietly and stays ready to intervene.", bn: "শুধু দিকনির্দেশনা। জামিল নিজে পরিকল্পনা করে ও কমেন্ট্রি দেয়। মোহাম্মদ চুপচাপ পর্যবেক্ষণ করেন, তবে হস্তক্ষেপের জন্য প্রস্তুত।" },
-          route: ["Aldborough Road South", "Cameron Road", "High Road", "Electric Parade", "Felbridge Road", "Granton Road", "Kildowan Road Test Centre"],
+          route: ["Ladysmith Avenue", "Aldborough Road South", "Cameron Road", "High Road", "Electric Parade", "Felbridge Road", "Granton Road", "Kildowan Road Test Centre"],
           blocks: [
             {
-              title: { en: "Aldborough Road South → Cameron Road → High Road → Electric Parade", bn: "অলডবরো রোড সাউথ → ক্যামেরন রোড → হাই রোড → ইলেকট্রিক প্যারেড" },
+              title: { en: "Ladysmith Avenue → Aldborough Road South → Cameron Road → High Road → Electric Parade", bn: "লেডিস্মিথ অ্যাভিনিউ → অলডবরো রোড সাউথ → ক্যামেরন রোড → হাই রোড → ইলেকট্রিক প্যারেড" },
               coach: { en: "Stay quiet unless needed. Silence is a teaching tool here — he must show the goal independently.", bn: "প্রয়োজন ছাড়া চুপ থাকুন। এখানে নীরবতাই শিক্ষার কৌশল — তাকে স্বাধীনভাবে লক্ষ্য অর্জন দেখাতে হবে।" },
               lines: [
                 ["J", "There's a parked van on my side and a car approaching. I'll hold back in the gap before the van."],
@@ -372,7 +374,7 @@ window.ADI = {
       id: "p4",
       num: 4,
       title: { en: "Debrief & self-evaluation", bn: "ডিব্রিফ ও আত্ম-মূল্যায়ন" },
-      time: "4–5 min",
+      time: "≤ 3 min",
       area: "Teaching & Learning",
       summary: {
         en: "Jamil reflects first. Re-check the confidence score against the start, confirm the key learning points, and agree the next step.",
@@ -432,7 +434,7 @@ window.ADI = {
     { n: 7,  phase: "p3", title: { en: "Green Lane / Goodmayes Lane: waiting in the gap", bn: "গ্রিন লেন / গুডমেইজ লেন: গ্যাপে অপেক্ষা" }, chars: ["[CAR]", "[JAMIL]"], camera: "Drone shot looking down the narrow road, cars parked both sides", lighting: "Soft overcast, long subtle shadows", action: "[CAR] slows early and tucks into a gap on the left with a 1-metre clearance; oncoming car passes; [CAR] continues." },
     { n: 8,  phase: "p3", title: { en: "Trenance Gardens: blind bend fault", bn: "ট্রেনান্স গার্ডেন্স: ব্লাইন্ড বেন্ডে ভুল" }, chars: ["[CAR]", "[INSTRUCTOR]", "[JAMIL]"], camera: "Tense side tracking shot, cut to close-up of the dual brake being pressed", lighting: "Slightly cooler grade, view beyond the bend hidden by parked cars", action: "[CAR] approaches the bend too fast and drifts to the centre. [INSTRUCTOR] says 'Ease off now' and lightly presses the dual brake; an oncoming car appears and passes safely." },
     { n: 9,  phase: "p3", title: { en: "FCPS conversation at the kerb", bn: "কার্বে থেমে FCPS আলোচনা" }, chars: ["[INSTRUCTOR]", "[JAMIL]", "[EXAMINER]"], camera: "Static interior wide shot, [EXAMINER] visible in the rear writing notes", lighting: "Warm, reassuring tone returns", action: "Parked on the left. F, C, P, S labels animate in one by one as [JAMIL] answers each question." },
-    { n: 10, phase: "p3", title: { en: "Level 2: shared decisions, Westrow Gardens → High Road", bn: "লেভেল ২: যৌথ সিদ্ধান্ত, ওয়েস্ট্রো গার্ডেন্স → হাই রোড" }, chars: ["[CAR]", "[INSTRUCTOR]", "[JAMIL]"], camera: "Dashboard cam showing both faces, then exterior pull-back", lighting: "Brightening sky", action: "[JAMIL] talks through his plan before a bend; [INSTRUCTOR] gives a thumbs-up instead of instructions." },
+    { n: 10, phase: "p3", title: { en: "Level 2: shared decisions, Gyllyngdune Gardens → High Road", bn: "লেভেল ২: যৌথ সিদ্ধান্ত, গিলিংডিউন গার্ডেন্স → হাই রোড" }, chars: ["[CAR]", "[INSTRUCTOR]", "[JAMIL]"], camera: "Dashboard cam showing both faces, then exterior pull-back", lighting: "Brightening sky", action: "[JAMIL] talks through his plan before a bend; [INSTRUCTOR] gives a thumbs-up instead of instructions." },
     { n: 11, phase: "p3", title: { en: "Level 3: independent, Electric Parade → Kildowan Road", bn: "লেভেল ৩: স্বাধীন, ইলেকট্রিক প্যারেড → কিলডোয়ান রোড" }, chars: ["[CAR]", "[JAMIL]", "[INSTRUCTOR]"], camera: "Smooth Steadicam-style follow shot, intercut with [INSTRUCTOR] quietly observing", lighting: "Light drizzle, wet reflections, calm tone", action: "[JAMIL] rejects a gap near a junction, waits at a wider gap, checks mirrors and passes a pedestrian safely." },
     { n: 12, phase: "p4", title: { en: "Debrief: from 5 to 8 out of 10", bn: "ডিব্রিফ: ১০-এ ৫ থেকে ৮" }, chars: ["[INSTRUCTOR]", "[JAMIL]", "[EXAMINER]", "[CAR]"], camera: "Two-shot, then pull back out of the window to a wide shot of the test centre", lighting: "Sun breaks through the clouds, warm finish", action: "[JAMIL] moves the scale marker from 5 to 8 and smiles. [EXAMINER] closes the clipboard. [CAR] parked outside Kildowan Road Test Centre." }
   ],
