@@ -13,7 +13,7 @@ Live site: https://adi-part-3.onrender.com
 1. **Dashboard** — DVSA score breakdown (Lesson Planning 12, Risk Management 15, Teaching & Learning 24), grade bands, core principles (pupil-centred learning, FCPS, dynamic risk management).
 2. **Exam Day** — run sheet from arriving at Kildowan Road Test Centre to the examiner's feedback: 3-minute opening (with practice timer), all 33 turns with exact directions, what to ask, what to say while waiting, both outcomes at Trenance Gardens, reflection, 'what to say when…' cards, fixes to the master script, and a Rehearse mode (flashcards that hide your line).
 3. **Lesson Plan & Script** — 4 phases with the full Mohammed/Jamil dialogue, SMART goal, confidence scale (5 → 7 → 8), interactive priority diagram, 23 m / 46 m stopping distances, dual-control protocol, and the three route levels with exact road names. Every block has a copy button.
-4. **Video Guide** — 12 animated scenes with camera, lighting and a ready-to-paste AI prompt. Paste an MP4, YouTube or Vimeo link into any scene to play your rendered clip (saved in your browser).
+4. **Video Guide** — a full 3D exam simulation (Three.js, runs in the browser): arrival, 3-minute opening, all 33 turns with the correct direction, meeting traffic, traffic lights, roundabouts, the Trenance Gardens bend and FCPS, handover, reflection and feedback — with subtitles, optional voice, chase/top/driver cameras, minimap and a Google Maps panel for the real road. Below it, 12 animated scenes with camera, lighting and a ready-to-paste AI prompt. Paste an MP4, YouTube or Vimeo link into any scene to play your rendered clip (saved in your browser).
 5. **Examiner Checklist** — all 17 DVSA competencies with lesson-specific evidence and 0–3 self-scoring, live total, grade and Risk Management auto-fail check.
 
 English, Bengali (বাংলা) or both side by side; light/dark mode; mobile-friendly.
@@ -25,6 +25,8 @@ index.html            page shell
 assets/data.js        lesson content
 assets/examday.js     exam-day run sheet, route and rehearsal content (edit to change scripts, scenes)
 assets/app.js         app logic
+assets/sim.js         3D exam simulation (route model per step in ROUTE)
+assets/vendor/        three.js r160 (vendored)
 assets/styles.css     compiled Tailwind CSS (committed, so no build is needed to deploy)
 src/input.css         Tailwind source
 tailwind.config.js    Tailwind config

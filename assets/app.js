@@ -562,6 +562,15 @@
           <h2 class="h2 mt-1">${isBn() ? "১২টি অ্যানিমেটেড ৩ডি সিন" : "12 animated 3D scenes"}</h2>
           <p class="mt-2 max-w-3xl text-sm text-slate-600 dark:text-slate-300">${T({ en: "Each scene has a player slot, camera angle, lighting and a ready-to-paste AI prompt. Paste a video link (MP4, YouTube or Vimeo) to attach your rendered clip — links are saved in this browser.", bn: "প্রতিটি সিনে প্লেয়ার, ক্যামেরা অ্যাঙ্গেল, লাইটিং ও কপি করার মতো এআই প্রম্পট আছে। রেন্ডার করা ক্লিপ যোগ করতে ভিডিও লিংক (MP4, YouTube বা Vimeo) পেস্ট করুন — লিংক এই ব্রাউজারে সেভ থাকবে।" })}</p>
         </div>
+        <section class="grid min-w-0 grid-cols-1 gap-3">
+          <div>
+            <p class="eyebrow">${isBn() ? "পুরো পরীক্ষার সিমুলেশন" : "Full exam simulation"}</p>
+            <h3 class="h2 mt-1">${isBn() ? "৩ডি-তে পুরো পরীক্ষা: আগমন থেকে ফলাফল" : "The whole exam in 3D: arrival to result"}</h3>
+            <p class="mt-2 max-w-3xl text-sm text-slate-600 dark:text-slate-300">${T({ en: "Every chapter follows your route and script: the opening, all 33 turns with the right direction, parked cars, waiting in gaps, the Trenance Gardens bend with FCPS, the handover and the reflection. Use Top view to see exactly which way each turn goes, and Real map to see the actual road.", bn: "প্রতিটি অধ্যায় আপনার রুট ও স্ক্রিপ্ট অনুসরণ করে: শুরু, সঠিক দিকসহ ৩৩টি মোড়, পার্ক করা গাড়ি, গ্যাপে অপেক্ষা, FCPS সহ ট্রেনান্স গার্ডেন্সের বাঁক, হস্তান্তর ও রিফ্লেকশন। প্রতিটি মোড় কোন দিকে যাচ্ছে তা দেখতে Top ভিউ, আর আসল রাস্তা দেখতে Real map ব্যবহার করুন।" })}</p>
+          </div>
+          <div id="simSlot"></div>
+          <p class="text-xs text-slate-500 dark:text-slate-400">${T({ en: "Streets are modelled for each turn; the Real map shows the actual road. Driving between turns is shortened.", bn: "প্রতিটি মোড়ের জন্য রাস্তা মডেল করা; Real map আসল রাস্তা দেখায়। মোড়ের মাঝের ড্রাইভিং সংক্ষিপ্ত করা।" })}</p>
+        </section>
         <section class="card p-5">
           <div class="flex flex-wrap items-center justify-between gap-2"><p class="font-bold text-slate-900 dark:text-white">${isBn() ? "স্টাইল ও চরিত্র" : "Global style & characters"}</p><button type="button" class="btn" data-copy="style">${I.copy}${isBn() ? "স্টাইল কপি" : "Copy style"}</button></div>
           <p class="mt-2 rounded-lg bg-slate-100 p-3 font-mono text-xs text-slate-700 dark:bg-slate-800 dark:text-slate-200">${D.style}</p>
@@ -572,6 +581,21 @@
         </div>
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">${scenes.map(sceneCard).join("")}</div>
       </div>`;
+    attachSim();
+  }
+  let simEl = null;
+  function attachSim() {
+    const slot = $("#simSlot");
+    if (!slot) return;
+    if (simEl) { slot.replaceWith(simEl); return; }
+    simEl = document.createElement("div");
+    simEl.id = "simRoot";
+    simEl.className = "min-w-0";
+    slot.replaceWith(simEl);
+    simEl.innerHTML = `<div class="grid aspect-video place-items-center rounded-2xl bg-slate-900 text-sm text-slate-400">Loading the 3D simulation…</div>`;
+    import("./sim.js").then((m) => m.mountSim(simEl)).catch((err) => {
+      simEl.innerHTML = `<div class="grid aspect-video place-items-center rounded-2xl bg-slate-900 p-6 text-center text-sm text-slate-300">The 3D simulation couldn't start in this browser (${esc(err.message || err)}). It needs WebGL — try Chrome, Edge or Safari.</div>`;
+    });
   }
 
   /* ================================================================
@@ -976,6 +1000,7 @@
     document.documentElement.lang = state.lang === "bn" ? "bn" : "en";
   }
   function show(tab, sub) {
+    if (simEl && simEl.__sim && tab !== "videos") simEl.__sim.pause();
     state.tab = RENDER[tab] ? tab : "dashboard";
     $$(".panel").forEach((p) => (p.hidden = p.id !== `panel-${state.tab}`));
     RENDER[state.tab]();
