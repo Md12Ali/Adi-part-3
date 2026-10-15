@@ -219,7 +219,7 @@ window.ADI = {
           level: 1,
           name: { en: "Full prompting", bn: "সম্পূর্ণ প্রম্পটিং" },
           desc: { en: "Mohammed talks Jamil through each meeting situation with questions and prompts.", bn: "মোহাম্মদ প্রতিটি পরিস্থিতিতে প্রশ্ন ও প্রম্পট দিয়ে জামিলকে গাইড করেন।" },
-          route: ["Kildowan Road", "Granton Road", "Green Lane", "Goodmayes Lane", "Trenance Gardens", "Westrow Gardens", "Levett Gardens", "Goodmayes Lane", "Terence Road", "Westrow Gardens", "Levett Gardens"],
+          route: ["Kildowan Road", "Granton Road", "Green Lane", "Goodmayes Lane", "Trenance Gardens", "Westrow Gardens", "Levett Gardens", "Goodmayes Lane", "Trenance Gardens", "Westrow Gardens", "Levett Gardens"],
           blocks: [
             {
               title: { en: "Kildowan Road → Granton Road → Green Lane: prompted scanning", bn: "কিলডোয়ান রোড → গ্র্যান্টন রোড → গ্রিন লেন: প্রম্পট সহ স্ক্যানিং" },
@@ -289,10 +289,10 @@ window.ADI = {
           level: 2,
           name: { en: "Shared responsibility", bn: "যৌথ দায়িত্ব" },
           desc: { en: "Mohammed asks questions; Jamil makes and explains his own decisions. Prompts only when needed.", bn: "মোহাম্মদ প্রশ্ন করেন; জামিল নিজের সিদ্ধান্ত নেয় ও ব্যাখ্যা করে। প্রয়োজন হলেই কেবল প্রম্পট।" },
-          route: ["Gyllyngdune Gardens", "Beamere Road", "Oakwood Gardens", "Green Lane", "New Road", "High Road", "Cameron Road", "Aldborough Road South", "Ward Road", "Mafeking Avenue"],
+          route: ["Gyllyngdune Gardens", "Breamore Road", "Oakwood Gardens", "Green Lane", "New Road", "High Road", "Cameron Road", "Aldborough Road South", "Wards Road", "Mafeking Avenue"],
           blocks: [
             {
-              title: { en: "Gyllyngdune Gardens → Beamere Road → Oakwood Gardens: applying the FCPS solution", bn: "গিলিংডিউন গার্ডেন্স → বিমিয়ার রোড → ওকউড গার্ডেন্স: FCPS সমাধান প্রয়োগ" },
+              title: { en: "Gyllyngdune Gardens → Breamore Road → Oakwood Gardens: applying the FCPS solution", bn: "গিলিংডিউন গার্ডেন্স → ব্রিমোর রোড → ওকউড গার্ডেন্স: FCPS সমাধান প্রয়োগ" },
               coach: { en: "Let him talk through his plan. Only step in if the plan is unsafe. Check that his Trenance Gardens solution is now being used.", bn: "তাকে নিজের পরিকল্পনা বলতে দিন। পরিকল্পনা অনিরাপদ হলেই কেবল হস্তক্ষেপ করুন। ট্রেনান্স গার্ডেন্সের সমাধান এখন ব্যবহার হচ্ছে কিনা দেখুন।" },
               lines: [
                 ["M", "There's another restricted bend coming up. Talk me through what you'll do."],
@@ -323,7 +323,7 @@ window.ADI = {
               ]
             },
             {
-              title: { en: "Cameron Road → Aldborough Road South → Ward Road → Mafeking Avenue: confidence check", bn: "ক্যামেরন রোড → অলডবরো রোড সাউথ → ওয়ার্ড রোড → মাফেকিং অ্যাভিনিউ: আত্মবিশ্বাস যাচাই" },
+              title: { en: "Cameron Road → Aldborough Road South → Wards Road → Mafeking Avenue: confidence check", bn: "ক্যামেরন রোড → অলডবরো রোড সাউথ → ওয়ার্ডস রোড → মাফেকিং অ্যাভিনিউ: আত্মবিশ্বাস যাচাই" },
               coach: { en: "Mid-lesson confidence check (7/10) — this is evidence for competency 4 (adapting the plan).", bn: "লেসনের মাঝে আত্মবিশ্বাস যাচাই (৭/১০) — এটা দক্ষতা ৪-এর (প্ল্যান মানিয়ে নেওয়া) প্রমাণ।" },
               lines: [
                 ["M", "Jamil, you're making much better decisions. How confident do you feel now about meeting oncoming traffic?"],
@@ -339,10 +339,10 @@ window.ADI = {
           level: 3,
           name: { en: "Independent driving", bn: "স্বাধীন ড্রাইভিং" },
           desc: { en: "Directions only. Jamil plans and commentates. Mohammed observes quietly and stays ready to intervene.", bn: "শুধু দিকনির্দেশনা। জামিল নিজে পরিকল্পনা করে ও কমেন্ট্রি দেয়। মোহাম্মদ চুপচাপ পর্যবেক্ষণ করেন, তবে হস্তক্ষেপের জন্য প্রস্তুত।" },
-          route: ["Ladysmith Avenue", "Aldborough Road South", "Cameron Road", "High Road", "Electric Parade", "Felbridge Road", "Granton Road", "Kildowan Road Test Centre"],
+          route: ["Ladysmith Avenue", "Aldborough Road South", "Cameron Road", "High Road", "Seven Kings Road", "Felbrigge Road", "Granton Road", "Kildowan Road Test Centre"],
           blocks: [
             {
-              title: { en: "Ladysmith Avenue → Aldborough Road South → Cameron Road → High Road → Electric Parade", bn: "লেডিস্মিথ অ্যাভিনিউ → অলডবরো রোড সাউথ → ক্যামেরন রোড → হাই রোড → ইলেকট্রিক প্যারেড" },
+              title: { en: "Ladysmith Avenue → Aldborough Road South → Cameron Road → High Road → Seven Kings Road", bn: "লেডিস্মিথ অ্যাভিনিউ → অলডবরো রোড সাউথ → ক্যামেরন রোড → হাই রোড → সেভেন কিংস রোড" },
               coach: { en: "Stay quiet unless needed. Silence is a teaching tool here — he must show the goal independently.", bn: "প্রয়োজন ছাড়া চুপ থাকুন। এখানে নীরবতাই শিক্ষার কৌশল — তাকে স্বাধীনভাবে লক্ষ্য অর্জন দেখাতে হবে।" },
               lines: [
                 ["J", "There's a parked van on my side and a car approaching. I'll hold back in the gap before the van."],
@@ -356,7 +356,7 @@ window.ADI = {
               ]
             },
             {
-              title: { en: "Felbridge Road → Granton Road → Kildowan Road Test Centre", bn: "ফেলব্রিজ রোড → গ্র্যান্টন রোড → কিলডোয়ান রোড টেস্ট সেন্টার" },
+              title: { en: "Felbrigge Road → Granton Road → Kildowan Road Test Centre", bn: "ফেলব্রিগ রোড → গ্র্যান্টন রোড → কিলডোয়ান রোড টেস্ট সেন্টার" },
               coach: { en: "Wet-road decisions and pedestrian awareness without prompting = SMART goal achieved.", bn: "প্রম্পট ছাড়াই ভেজা রাস্তার সিদ্ধান্ত ও পথচারী সচেতনতা = SMART লক্ষ্য অর্জিত।" },
               lines: [
                 ["J", "The road's wet, so I'll keep my speed down and leave extra room. No sudden steering or braking."],
@@ -435,7 +435,7 @@ window.ADI = {
     { n: 8,  phase: "p3", title: { en: "Trenance Gardens: blind bend fault", bn: "ট্রেনান্স গার্ডেন্স: ব্লাইন্ড বেন্ডে ভুল" }, chars: ["[CAR]", "[INSTRUCTOR]", "[JAMIL]"], camera: "Tense side tracking shot, cut to close-up of the dual brake being pressed", lighting: "Slightly cooler grade, view beyond the bend hidden by parked cars", action: "[CAR] approaches the bend too fast and drifts to the centre. [INSTRUCTOR] says 'Ease off now' and lightly presses the dual brake; an oncoming car appears and passes safely." },
     { n: 9,  phase: "p3", title: { en: "FCPS conversation at the kerb", bn: "কার্বে থেমে FCPS আলোচনা" }, chars: ["[INSTRUCTOR]", "[JAMIL]", "[EXAMINER]"], camera: "Static interior wide shot, [EXAMINER] visible in the rear writing notes", lighting: "Warm, reassuring tone returns", action: "Parked on the left. F, C, P, S labels animate in one by one as [JAMIL] answers each question." },
     { n: 10, phase: "p3", title: { en: "Level 2: shared decisions, Gyllyngdune Gardens → High Road", bn: "লেভেল ২: যৌথ সিদ্ধান্ত, গিলিংডিউন গার্ডেন্স → হাই রোড" }, chars: ["[CAR]", "[INSTRUCTOR]", "[JAMIL]"], camera: "Dashboard cam showing both faces, then exterior pull-back", lighting: "Brightening sky", action: "[JAMIL] talks through his plan before a bend; [INSTRUCTOR] gives a thumbs-up instead of instructions." },
-    { n: 11, phase: "p3", title: { en: "Level 3: independent, Electric Parade → Kildowan Road", bn: "লেভেল ৩: স্বাধীন, ইলেকট্রিক প্যারেড → কিলডোয়ান রোড" }, chars: ["[CAR]", "[JAMIL]", "[INSTRUCTOR]"], camera: "Smooth Steadicam-style follow shot, intercut with [INSTRUCTOR] quietly observing", lighting: "Light drizzle, wet reflections, calm tone", action: "[JAMIL] rejects a gap near a junction, waits at a wider gap, checks mirrors and passes a pedestrian safely." },
+    { n: 11, phase: "p3", title: { en: "Level 3: independent, Seven Kings Road → Kildowan Road", bn: "লেভেল ৩: স্বাধীন, সেভেন কিংস রোড → কিলডোয়ান রোড" }, chars: ["[CAR]", "[JAMIL]", "[INSTRUCTOR]"], camera: "Smooth Steadicam-style follow shot, intercut with [INSTRUCTOR] quietly observing", lighting: "Light drizzle, wet reflections, calm tone", action: "[JAMIL] rejects a gap near a junction, waits at a wider gap, checks mirrors and passes a pedestrian safely." },
     { n: 12, phase: "p4", title: { en: "Debrief: from 5 to 8 out of 10", bn: "ডিব্রিফ: ১০-এ ৫ থেকে ৮" }, chars: ["[INSTRUCTOR]", "[JAMIL]", "[EXAMINER]", "[CAR]"], camera: "Two-shot, then pull back out of the window to a wide shot of the test centre", lighting: "Sun breaks through the clouds, warm finish", action: "[JAMIL] moves the scale marker from 5 to 8 and smiles. [EXAMINER] closes the clipboard. [CAR] parked outside Kildowan Road Test Centre." }
   ],
 

@@ -25,12 +25,17 @@ index.html            page shell
 assets/data.js        lesson content
 assets/examday.js     exam-day run sheet, route and rehearsal content (edit to change scripts, scenes)
 assets/app.js         app logic
-assets/sim.js         3D exam simulation (route model per step in ROUTE)
+assets/route.js       real route geometry from TomTom (8.1 km, every junction of the script)
+assets/sim.js         3D exam simulation built on the real route (junction model per step in SPEC)
 assets/vendor/        three.js r160 (vendored)
 assets/styles.css     compiled Tailwind CSS (committed, so no build is needed to deploy)
 src/input.css         Tailwind source
 tailwind.config.js    Tailwind config
 ```
+
+## Route data
+
+The route was checked and drawn with TomTom (geocoding + routing through every junction in the master script). Corrected names: Beamere → Breamore Road, Terence Road → Trenance Gardens (second pass of the bend), Ward → Wards Road, Felbridge → Felbrigge Road, Electric Parade → Seven Kings Road. Test centre: Goodmayes Driving Test Centre, 98 Goodmayes Road.
 
 ## Editing styles
 

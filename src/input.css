@@ -76,6 +76,12 @@
   .sim-chip[aria-current="true"] { @apply border-blue-600 bg-blue-600 text-white; }
   [data-sim]:fullscreen { @apply flex flex-col; }
   [data-sim]:fullscreen [data-stage] { aspect-ratio: auto; max-height: none; flex: 1 1 auto; }
+  .rm-casing { stroke: #ffffff; }
+  .dark .rm-casing { stroke: #334155; }
+  .rm-label { fill: #334155; color: #334155; paint-order: stroke; stroke: rgba(255,255,255,.9); stroke-width: 4px; }
+  .dark .rm-label { fill: #e2e8f0; color: #e2e8f0; stroke: rgba(2,6,23,.9); }
+  .rm-mark { cursor: pointer; }
+  .rm-mark:hover rect { filter: brightness(1.15); }
   .road-car { transition: transform 1.1s cubic-bezier(.45,.05,.25,1), opacity .4s ease; }
 }
 

@@ -706,7 +706,7 @@
           <p class="mb-3 text-sm font-bold ${k === "fault" ? "text-rose-700 dark:text-rose-300" : "text-emerald-700 dark:text-emerald-300"}">${k === "fault" ? "⚠️" : "✅"} ${T(X.bend[k].title)}</p>
           <ol class="space-y-3">${X.bend[k].lines.map(lineHTML).join("")}</ol></div>`).join("")}
       </div>` : "";
-    return `<li class="relative flex gap-3 pb-6 last:pb-0">
+    return `<li class="relative flex scroll-mt-44 gap-3 pb-6 last:pb-0" id="exam-step-${s.n}">
       <span class="absolute left-[15px] top-9 bottom-0 w-0.5 ${L.line}" aria-hidden="true"></span>
       <span class="relative z-10 grid h-8 w-8 shrink-0 place-items-center rounded-full ${L.badge} text-xs font-extrabold text-white">${s.n}</span>
       <div class="min-w-0 flex-1">
@@ -735,6 +735,50 @@
       }).join("")}</ul></div>`;
   }
 
+  /* Real route map (TomTom geometry) */
+  function routeMapSVG() {
+    const G = window.ROUTE_GEO; if (!G) return "";
+    const pts = G.pts; const cum = [0];
+    for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+    const nearestFwd = (q, from) => { let best = from, bd = 1e9; for (let i = from; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - q[0], pts[i][1] - q[1]); if (d < bd) { bd = d; best = i; } if (bd < 14 && d > bd + 20) break; } return best; };
+    const atU = (u) => { for (let i = 1; i < cum.length; i++) if (cum[i] >= u) { const t = (u - cum[i - 1]) / Math.max(1e-6, cum[i] - cum[i - 1]); return [pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * t, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * t]; } return pts[pts.length - 1]; };
+    const JU = {}; let from = 0;
+    for (let n = 1; n <= 33; n++) { if (!G.J[n]) continue; const i = nearestFwd(G.J[n], from); JU[n] = cum[i]; from = i + 1; }
+    JU[5] = JU[4] + 270; JU[7] = JU[8] - 70;
+    const xs = pts.map((p) => p[0]), ys = pts.map((p) => -p[1]);
+    const pad = 70, minX = Math.min(...xs) - pad, maxX = Math.max(...xs) + pad, minY = Math.min(...ys) - pad, maxY = Math.max(...ys) + pad;
+    const d = pts.map((p, i) => `${i ? "L" : "M"}${p[0].toFixed(1)} ${(-p[1]).toFixed(1)}`).join("");
+    // markers (merge steps at the same junction)
+    const groups = [];
+    for (let n = 1; n <= 33; n++) {
+      const p = atU(JU[n]); const g = groups.find((g) => Math.hypot(g.p[0] - p[0], g.p[1] - p[1]) < 22);
+      if (g) g.ns.push(n); else groups.push({ p, ns: [n] });
+    }
+    const LV = { 1: "#0ea5e9", 2: "#8b5cf6", 3: "#10b981" };
+    const marks = groups.map((g) => {
+      const lv = X.route[g.ns[0] - 1].level; const label = g.ns.join("·"); const w = 14 + label.length * 7;
+      return `<a href="#exam/step-${g.ns[0]}" class="rm-mark"><title>${g.ns.map((n) => `${n}. ${X.route[n - 1].road}`).join(" / ")}</title><rect x="${(g.p[0] - w / 2).toFixed(1)}" y="${(-g.p[1] - 11).toFixed(1)}" width="${w}" height="22" rx="11" fill="${LV[lv]}" stroke="#fff" stroke-width="2.5"/><text x="${g.p[0].toFixed(1)}" y="${(-g.p[1] + 4.5).toFixed(1)}" text-anchor="middle" font-size="12.5" font-weight="800" fill="#fff">${label}</text></a>`;
+    }).join("");
+    // street labels
+    const seen = new Set(); const labels = [];
+    for (let n = 1; n <= 33; n++) {
+      const name = X.route[n - 1].road.replace(/ \(again\)$/, ""); if (seen.has(name) || /roundabout|sign|centre/i.test(name)) continue;
+      const u0 = JU[n], u1 = n < 33 ? JU[n + 1] : cum[cum.length - 1]; if (u1 - u0 < 90) continue;
+      const a = atU(u0 + (u1 - u0) * 0.5), b = atU(u0 + (u1 - u0) * 0.5 + 12);
+      let ang = (Math.atan2(-(b[1] - a[1]), b[0] - a[0]) * 180) / Math.PI; if (ang > 90) ang -= 180; if (ang < -90) ang += 180;
+      seen.add(name); labels.push(`<text transform="translate(${a[0].toFixed(1)} ${(-a[1]).toFixed(1)}) rotate(${ang.toFixed(0)}) translate(0 -14)" text-anchor="middle" font-size="13" font-weight="700" class="rm-label">${name}</text>`);
+    }
+    const st = pts[0];
+    return `<svg viewBox="${minX.toFixed(0)} ${minY.toFixed(0)} ${(maxX - minX).toFixed(0)} ${(maxY - minY).toFixed(0)}" class="h-auto w-full" role="img" aria-label="Real route map from TomTom">
+      <path d="${d}" fill="none" class="rm-casing" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="${d}" fill="none" stroke="#2563eb" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      ${labels.join("")}
+      <g transform="translate(${st[0].toFixed(1)} ${(-st[1]).toFixed(1)})"><circle r="16" fill="#0f172a" stroke="#fff" stroke-width="3"/><text y="5" text-anchor="middle" font-size="14" fill="#fff">🏁</text></g>
+      ${marks}
+      <g transform="translate(${(maxX - 40).toFixed(0)} ${(minY + 46).toFixed(0)})" class="rm-label"><path d="M0 -28 L9 0 L0 -6 L-9 0 Z" fill="currentColor"/><text y="20" text-anchor="middle" font-size="16" font-weight="800">N</text></g>
+    </svg>`;
+  }
+
   function renderExamRead() {
     const before = X.stages[0], arrive = X.stages[1], intro = X.stages[2];
     const levels = [1, 2, 3].map((lv) => `
@@ -753,6 +797,34 @@
         <section class="card scroll-mt-44 p-5 sm:p-7" id="exam-rules">
           <p class="eyebrow">${isBn() ? "গ্রেড এ-র ১০টি নিয়ম" : "10 rules for a Grade A"}</p>
           <ol class="mt-4 grid gap-3 md:grid-cols-2">${X.golden.map((g, i) => `<li class="flex gap-3"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-blue-600 text-xs font-extrabold text-white">${i + 1}</span><p class="text-sm">${T(g)}${g.src ? ` <span class="chip ml-1 align-middle">${g.src}</span>` : ""}</p></li>`).join("")}</ol>
+        </section>
+
+        <section class="card scroll-mt-44 p-5 sm:p-7" id="exam-map">
+          <div class="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <p class="eyebrow">${isBn() ? "আসল রুট ম্যাপ · TomTom" : "Real route map · TomTom"}</p>
+              <h3 class="mt-1 text-lg font-extrabold text-slate-900 sm:text-xl dark:text-white">${isBn() ? "৮.১ কিমি · ৩৩টি মোড় · প্রায় ১৯ মিনিট ড্রাইভিং" : "8.1 km · 33 turns · about 19 minutes of driving"}</h3>
+            </div>
+            <div class="flex flex-wrap gap-2 text-[11px] font-bold">
+              <span class="chip"><span class="h-2.5 w-2.5 rounded-full bg-sky-500"></span>${t1(X.levels[1])}</span>
+              <span class="chip"><span class="h-2.5 w-2.5 rounded-full bg-violet-500"></span>${t1(X.levels[2])}</span>
+              <span class="chip"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>${t1(X.levels[3])}</span>
+            </div>
+          </div>
+          <div class="mt-4 overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-950">${routeMapSVG()}</div>
+          <p class="mt-3 text-xs text-slate-500 dark:text-slate-400">${T({ en: "Exact road shapes from TomTom routing through every junction in your script. Tap a number to jump to that turn. Numbers sharing a bubble are the same junction visited twice (e.g. 8·12).", bn: "আপনার স্ক্রিপ্টের প্রতিটি জাংশন দিয়ে TomTom রাউটিং থেকে আসল রাস্তার আকার। নম্বরে চাপলে সেই মোড়ে যাবে। এক বাবলে দুটি নম্বর মানে একই জাংশন দুবার (যেমন ৮·১২)।" })}</p>
+          <div class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-100">
+            <p class="font-bold">${isBn() ? "TomTom দিয়ে রাস্তার নাম সংশোধন" : "Road names corrected with TomTom"}</p>
+            <ul class="mt-2 grid gap-1 sm:grid-cols-2">
+              <li>Beamere Road → <b>Breamore Road</b></li>
+              <li>Terence Road → <b>Trenance Gardens</b> ${isBn() ? "(দ্বিতীয়বার বাঁকে)" : "(the bend, second time)"}</li>
+              <li>Ward Road → <b>Wards Road</b></li>
+              <li>Felbridge Road → <b>Felbrigge Road</b></li>
+              <li>Electric Parade → <b>Seven Kings Road</b></li>
+              <li>Westow Garden → <b>Westrow Gardens</b></li>
+            </ul>
+            <p class="mt-2 text-xs opacity-80">${isBn() ? "টেস্ট সেন্টার: Goodmayes Driving Test Centre, 98 Goodmayes Road (কিলডোয়ান রোডের মোড়ে)।" : "Test centre: Goodmayes Driving Test Centre, 98 Goodmayes Road (at the Kildowan Road corner)."}</p>
+          </div>
         </section>
 
         <section class="card scroll-mt-44 p-5 sm:p-7" id="exam-before">
@@ -888,7 +960,7 @@
   }
 
   function renderExam() {
-    const nav = [["rules", isBn() ? "নিয়ম" : "Rules"], ["before", isBn() ? "আগের দিন" : "Before"], ["arrive", isBn() ? "আগমন" : "Arrive"], ["intro", isBn() ? "শুরু" : "Opening"], ["l1", isBn() ? "লেভেল ১" : "Level 1"], ["l2", isBn() ? "লেভেল ২" : "Level 2"], ["l3", isBn() ? "লেভেল ৩" : "Level 3"], ["debrief", isBn() ? "রিফ্লেকশন" : "Reflection"], ["talk", isBn() ? "কী বলব" : "What to say"], ["fixes", isBn() ? "সংশোধন" : "Fixes"]];
+    const nav = [["rules", isBn() ? "নিয়ম" : "Rules"], ["map", isBn() ? "ম্যাপ" : "Map"], ["before", isBn() ? "আগের দিন" : "Before"], ["arrive", isBn() ? "আগমন" : "Arrive"], ["intro", isBn() ? "শুরু" : "Opening"], ["l1", isBn() ? "লেভেল ১" : "Level 1"], ["l2", isBn() ? "লেভেল ২" : "Level 2"], ["l3", isBn() ? "লেভেল ৩" : "Level 3"], ["debrief", isBn() ? "রিফ্লেকশন" : "Reflection"], ["talk", isBn() ? "কী বলব" : "What to say"], ["fixes", isBn() ? "সংশোধন" : "Fixes"]];
     $("#panel-exam").innerHTML = `
       <div class="mb-5">
         <p class="eyebrow">${isBn() ? "পরীক্ষার দিন" : "Exam day"}</p>
