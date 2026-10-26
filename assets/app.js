@@ -557,6 +557,7 @@
     const filters = [["all", isBn() ? "সব (১২)" : "All (12)"]].concat(D.phases.map((p) => [p.id, `${isBn() ? "ফেজ" : "Phase"} ${p.num}`]));
     $("#panel-videos").innerHTML = `
       <div class="grid grid-cols-1 gap-6">
+        ${mediaSection()}
         <div>
           <p class="eyebrow">${isBn() ? "অ্যানিমেশন গাইড" : "Video animation guide"}</p>
           <h2 class="h2 mt-1">${isBn() ? "১২টি অ্যানিমেটেড ৩ডি সিন" : "12 animated 3D scenes"}</h2>
@@ -583,6 +584,50 @@
       </div>`;
     attachSim();
   }
+  /* ---------------- Grade A mock lesson: audio, script, video ---------------- */
+  const MEDIA = {
+    mp3: "assets/media/ADI-Part3-Grade-A-Lesson.mp3",
+    pdf: "assets/media/ADI-Part3-Grade-A-Script-A4.pdf",
+    mp4: null, // set when the 3D video is added
+    chapters: [
+      [0, { en: "Rules, grades and the 17 competencies", bn: "নিয়ম, গ্রেড ও ১৭টি দক্ষতা" }],
+      [141, { en: "Start: goal and risk (under 3 min)", bn: "শুরু: লক্ষ্য ও রিস্ক (৩ মিনিটের কম)" }],
+      [281, { en: "Stage 1 · Guide (steps 1–12)", bn: "স্টেজ ১ · গাইড (ধাপ ১–১২)" }],
+      [458, { en: "Pull up 1 · Trenance Gardens bend", bn: "পুল আপ ১ · ট্রেনান্স গার্ডেন্সের বাঁক" }],
+      [645, { en: "Stage 2 · Prompt (steps 13–22)", bn: "স্টেজ ২ · প্রম্পট (ধাপ ১৩–২২)" }],
+      [822, { en: "Pull up 2 · Hand over (Ladysmith Avenue)", bn: "পুল আপ ২ · হস্তান্তর (লেডিস্মিথ অ্যাভিনিউ)" }],
+      [865, { en: "Stage 3 · Independent (steps 23–31)", bn: "স্টেজ ৩ · স্বাধীন (ধাপ ২৩–৩১)" }],
+      [933, { en: "Pull up 3 · Recap (under 3 min)", bn: "পুল আপ ৩ · রিক্যাপ (৩ মিনিটের কম)" }],
+      [1010, { en: "Examiner's marks, timing plan, mistakes, 10 habits", bn: "এক্সামিনারের নম্বর, সময়ের পরিকল্পনা, ভুল, ১০টি অভ্যাস" }]
+    ]
+  };
+  const mmss = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+  function mediaSection() {
+    const dl = "inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white";
+    const dl2 = "inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:border-blue-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200";
+    const video = MEDIA.mp4 ? `
+        <div class="mt-5">
+          <p class="text-sm font-bold text-slate-900 dark:text-white">${T({ en: "3D video of the whole lesson", bn: "পুরো লেসনের ৩ডি ভিডিও" })}</p>
+          <video class="mt-2 aspect-video w-full rounded-xl bg-slate-900" controls preload="none" playsinline src="${MEDIA.mp4}"></video>
+          <a class="${dl2} mt-2" href="${MEDIA.mp4}" download>${t1({ en: "Download video (MP4)", bn: "ভিডিও ডাউনলোড (MP4)" })}</a>
+        </div>` : "";
+    return `
+      <section class="card p-5">
+        <p class="eyebrow">${isBn() ? "শুনুন ও প্রিন্ট করুন" : "Listen and print"}</p>
+        <h2 class="h2 mt-1">${isBn() ? "গ্রেড A মক লেসন" : "Grade A mock lesson"}</h2>
+        <p class="mt-2 max-w-3xl text-sm text-slate-600 dark:text-slate-300">${T({ en: "A 19-minute recording of the whole lesson: you, Jamil, and the examiner. After each chime, the examiner says which competency you just scored. It follows the GOV.UK timing: goals and risk in under 3 minutes, about 40 minutes of driving, and up to 3 minutes for reflection. The printed script has every line you say, step by step.", bn: "পুরো লেসনের ১৯ মিনিটের রেকর্ডিং: আপনি, জামিল ও এক্সামিনার। প্রতিটি চাইমের পরে এক্সামিনার বলেন আপনি কোন দক্ষতায় নম্বর পেলেন। এটি GOV.UK-এর সময় মেনে চলে: লক্ষ্য ও রিস্ক ৩ মিনিটের কম, প্রায় ৪০ মিনিট ড্রাইভিং, আর রিফ্লেকশনে সর্বোচ্চ ৩ মিনিট। প্রিন্ট করা স্ক্রিপ্টে আপনার প্রতিটি লাইন ধাপে ধাপে আছে।" })}</p>
+        <audio id="lessonAudio" class="mt-4 w-full" controls preload="metadata" src="${MEDIA.mp3}"></audio>
+        <div class="mt-3 grid gap-1.5 sm:grid-cols-2" role="group" aria-label="Chapters">
+          ${MEDIA.chapters.map(([s, l]) => `<button type="button" data-seek="${s}" class="flex items-start gap-2 rounded-lg border border-slate-200 px-3 py-2 text-left text-sm hover:border-blue-300 dark:border-slate-800"><span class="font-mono text-xs font-bold text-blue-700 dark:text-blue-300">${mmss(s)}</span><span class="text-slate-700 dark:text-slate-200">${T(l)}</span></button>`).join("")}
+        </div>
+        <div class="mt-4 flex flex-wrap gap-2">
+          <a class="${dl}" href="${MEDIA.mp3}" download>${t1({ en: "Download MP3", bn: "MP3 ডাউনলোড" })}</a>
+          <a class="${dl2}" href="${MEDIA.pdf}" target="_blank" rel="noopener">${t1({ en: "Script to print (A4 PDF)", bn: "প্রিন্টের জন্য স্ক্রিপ্ট (A4 PDF)" })}</a>
+        </div>
+        ${video}
+      </section>`;
+  }
+
   let simEl = null;
   function attachSim() {
     const slot = $("#simSlot");
@@ -1095,6 +1140,7 @@
     const d = el.dataset;
 
     if (d.tab) { if (location.hash !== `#${d.tab}`) location.hash = d.tab; else show(d.tab); return; }
+    if (d.seek !== undefined) { const a = $("#lessonAudio"); if (a) { a.currentTime = +d.seek; a.play().catch(() => {}); } return; }
     if (d.lang) { state.lang = d.lang; store.set("adi3-lang", d.lang); rerender(); return; }
     if (el.id === "themeBtn") {
       const dark = document.documentElement.classList.toggle("dark");
