@@ -56,4 +56,4 @@ Optional: set the build command to `npm install && npm run build:css` to rebuild
 **GitHub Pages:** Settings → Pages → Deploy from branch → `main` / root.
 
 ---
-Personal study aid. Not an official DVSA product. Scoring per the DVSA standards check form; stopping distances per the Highway Code.
+Personal study aid. Not an official DVSA product. Scoring per the DVSA ADI Part 3 test report form (the same 17 competencies as the standards check); stopping distances per the Highway Code.

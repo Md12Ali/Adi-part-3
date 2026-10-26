@@ -82,15 +82,17 @@
   /* ---------------- scores ---------------- */
   function totals() {
     const by = { lp: 0, rm: 0, tls: 0 };
-    let scored = 0;
+    let scored = 0, rmLeft = 0;
     D.competencies.forEach((c) => {
       const v = state.scores[c.n];
       if (typeof v === "number") { by[c.area] += v; scored++; }
+      else if (c.area === "rm") rmLeft++;
     });
     const total = by.lp + by.rm + by.tls;
     let grade = "Fail";
     if (total >= 43) grade = "A"; else if (total >= 31) grade = "B";
-    const rmFail = scored > 0 && by.rm <= 7;
+    // Auto-fail only once 8+ in Risk Management can no longer be reached
+    const rmFail = scored > 0 && by.rm + rmLeft * 3 <= 7;
     if (rmFail) grade = "Fail";
     return { by, total, scored, grade, rmFail };
   }
@@ -315,7 +317,7 @@
     },
     theirs: {
       label: { en: "Parked on their side", bn: "তাদের পাশে পার্ক করা" },
-      verdict: { en: "We may have priority — proceed with care, never force it. They should wait.", bn: "আমাদের অগ্রাধিকার থাকতে পারে — সাবধানে এগোন, জোর করবেন না। তারা অপেক্ষা করবে।" },
+      verdict: { en: "They should normally wait — but no rule gives right of way. Proceed with care, never force it.", bn: "সাধারণত তাদের অপেক্ষা করা উচিত — কিন্তু কোনো নিয়ম পথের অধিকার দেয় না। সাবধানে এগোন, জোর করবেন না।" },
       parkedTop: [], parkedBot: [250, 328, 406],
       gap: { x: 486, y: 150, w: 96 },
       us: { from: 10, to: 620 }, them: { from: 650, to: 504 }, door: null
